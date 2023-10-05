@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>rosmsg</name>
+	<name>stm32_to_ros</name>
 	<comment></comment>
 	<projects>
 	</projects>

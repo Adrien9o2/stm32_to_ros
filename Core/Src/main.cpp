@@ -24,8 +24,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <list>
-# include "msg.hpp"
+# include "msg_handler.hpp"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,6 +45,8 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+TIM_HandleTypeDef htim2;
+
 UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_usart2_tx;
 DMA_HandleTypeDef hdma_usart2_rx;
@@ -53,11 +54,11 @@ DMA_HandleTypeDef hdma_usart2_rx;
 /* USER CODE BEGIN PV */
 
 
-
+MsgHandler msg_handler(&huart2);
 float to_send = 0.1;
 bool oneof2led = false;
-AcknowledgeClass singleack;
-std::list<std::unique_ptr<AbstractMsg>> tx_msg_list;
+bool timer_20_ms = false;
+
 
 
 /* USER CODE END PV */
@@ -67,6 +68,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_USART2_UART_Init(void);
+static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
 void send_print(const char* msg);
 void send_float(float float_to_send);
@@ -74,15 +76,7 @@ void send_float(float float_to_send);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void transmit_front_msg()
-{
-	HAL_UART_Transmit_DMA(&huart2, (uint8_t*)tx_msg_list.front()->get_data(), tx_msg_list.front()->get_data_size());
-}
 
-void receive_ack()
-{
-	HAL_UART_Receive_DMA(&huart2, singleack.get_data(), singleack.get_data_size());
-}
 /* USER CODE END 0 */
 
 /**
@@ -115,9 +109,12 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_USART2_UART_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   char print_msg[50] = "Hello World\n";
   float tosend1 = 0.1;
+  HAL_TIM_Base_Start_IT(&htim2);
+  HAL_GPIO_TogglePin(LD2_GPIO_Port,LD2_Pin);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -125,8 +122,8 @@ int main(void)
   while (1)
   {
 	 HAL_Delay(1000);
-	 send_print(print_msg);
-	 send_float(tosend1);
+	 msg_handler.send_print(print_msg);
+	 msg_handler.send_float(tosend1);
 	 HAL_Delay(1000);
 
 
@@ -149,7 +146,7 @@ void SystemClock_Config(void)
   /** Configure the main internal regulator output voltage
   */
   __HAL_RCC_PWR_CLK_ENABLE();
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -160,11 +157,18 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
   RCC_OscInitStruct.PLL.PLLM = 16;
-  RCC_OscInitStruct.PLL.PLLN = 336;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
+  RCC_OscInitStruct.PLL.PLLN = 360;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 2;
   RCC_OscInitStruct.PLL.PLLR = 2;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Activate the Over-Drive mode
+  */
+  if (HAL_PWREx_EnableOverDrive() != HAL_OK)
   {
     Error_Handler();
   }
@@ -175,13 +179,58 @@ void SystemClock_Config(void)
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV4;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief TIM2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM2_Init(void)
+{
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 0;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 1800000;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
+
 }
 
 /**
@@ -274,87 +323,34 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void send_print(const char* msg)
-{
-	if( strlen(msg) < UINT8_MAX)
-	{
-		tx_msg_list.push_back(std::make_unique<HeaderClass>(SerialID::MSG_PRINT,strlen(msg)));
-		tx_msg_list.push_back(std::make_unique<PayloadClass>(msg,strlen(msg)));
-		if( tx_msg_list.size() == 2)
-		{
-			transmit_front_msg();
-		}
-	}
-
-}
-
-void send_float(float float_to_send)
-{
-	tx_msg_list.push_back(std::make_unique<HeaderClass>(SerialID::MSG_DATA_1,sizeof(float)));
-	tx_msg_list.push_back(std::make_unique<PayloadClass>(&float_to_send,sizeof(float)));
-	if( tx_msg_list.size() == 2)
-	{
-		transmit_front_msg();
-	}
-
-}
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
-	if ( huart == &huart2)
+	if (huart == &huart2)
 	{
-		if ( !tx_msg_list.empty())
-		{
-			if( tx_msg_list.front()->get_type() == msg_type::payload)
-			{
-				tx_msg_list.pop_front();
-				if ( !tx_msg_list.empty())
-				{
-					if(tx_msg_list.front()->get_type() == msg_type::header)
-					{
-						transmit_front_msg();
-					}
-				}
-			}
-			else if ( tx_msg_list.front()->get_type() == msg_type::header)
-			{
-				receive_ack();
-			}
-		}
-
-
-
+		msg_handler.process_txclpt_callback();
 	}
+
 
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	if ( huart == &huart2)
+	if( huart == &huart2)
 	{
-		if(singleack.get_data()[0] == SerialID::MSG_ACK)
-		{
-			if( tx_msg_list.front()->get_type() == msg_type::header && tx_msg_list.front()->get_data()[1] == singleack.get_data()[1])
-			{
-				if(oneof2led == false)
-				{
-					HAL_GPIO_TogglePin(LD2_GPIO_Port,LD2_Pin);
-					oneof2led = true;
-				}
-				else
-				{
-					oneof2led = false;
-				}
-				tx_msg_list.pop_front();
-				if( tx_msg_list.front()->get_type() == msg_type::payload)
-				{
-					transmit_front_msg();
-				}
-
-			}
-		}
-
+		msg_handler.process_rxclpt_callback();
 	}
+
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  // Check which version of the timer triggered this callback and toggle LED
+  if (htim == &htim2 )
+  {
+	  timer_20_ms = true;
+	  msg_handler.process_timeout();
+  }
 }
 
 

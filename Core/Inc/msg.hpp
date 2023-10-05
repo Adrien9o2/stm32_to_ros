@@ -8,9 +8,10 @@ namespace SerialID
 {
 	constexpr uint8_t MSG_ACK = 0xFF;
 	constexpr uint8_t MSG_START = 0xFE;
-	constexpr uint8_t MSG_NO_ACK = 0xFD;
-	constexpr uint8_t MSG_NO_ID = 0xFC;
-	constexpr uint8_t MSG_NO_START = 0xFB;
+	constexpr uint8_t MSG_NO_START = 0xFD;
+	constexpr uint8_t MSG_NO_ACK = 0xFC;
+	constexpr uint8_t MSG_NO_ID = 0xFB;
+	constexpr uint8_t MSG_NO_SIZE = 0xFA;
 	constexpr uint8_t MSG_PRINT = 0x00;
 	constexpr uint8_t MSG_DATA_1 = 0x01;
 };
@@ -84,21 +85,42 @@ class PayloadClass : public AbstractMsg
 		uint8_t _data_size;
 		std::unique_ptr<uint8_t[]> _data;
 };
-class AcknowledgeClass : public AbstractMsg
+class AckMsg : public AbstractMsg
 {
-	static const msg_type ack_msg_type = header;
-	static const uint8_t ack_size = 3;
+	static const msg_type incoming_msg_type = acknowledge;
+	static const uint8_t incoming_msg_size = 3;
 	public:
-		AcknowledgeClass(): _data(new uint8_t[AcknowledgeClass::ack_size])
+		AckMsg(): _data(new uint8_t[AckMsg::incoming_msg_size])
 		{
-			_data[0] = SerialID::MSG_NO_START;
-			_data[1] = SerialID::MSG_NO_ACK;
-			_data[2] = SerialID::MSG_NO_ID;
+			_data[0] = SerialID::MSG_NO_ACK;
+			_data[1] = SerialID::MSG_NO_ID;
+			_data[2] = SerialID::MSG_NO_SIZE;
 		};
-		~AcknowledgeClass() = default;
+		~AckMsg() = default;
+		AckMsg& operator=(const AckMsg& to_copy)
+		{
+			if (this != &to_copy)
+			{
+				if(to_copy._data)
+				{
+					for(int i = 0; i< AckMsg::incoming_msg_size; i ++)
+					{
+						_data[i] = to_copy._data[i];
+					}
+				}
+				else
+				{
+					_data.reset();
+				}
+
+
+			}
+			return *this;
+
+		}
 		uint8_t* get_data() const noexcept override {return _data.get();}
-		msg_type get_type() const noexcept override {return AcknowledgeClass::ack_msg_type;}
-		uint8_t get_data_size() const noexcept override {return AcknowledgeClass::ack_size;}
+		msg_type get_type() const noexcept override {return AckMsg::incoming_msg_type;}
+		uint8_t get_data_size() const noexcept override {return AckMsg::incoming_msg_size;}
 	private:
 		std::unique_ptr<uint8_t[]> _data;
 
