@@ -1,0 +1,89 @@
+../Core/Inc/Component.h:76:13:Component::~Component()	16	static
+../Core/Inc/Component.h:76:13:virtual Component::~Component()	16	static
+../Core/Inc/StepperMotor.h:270:13:StepperMotor::~StepperMotor()	16	static
+../Core/Inc/StepperMotor.h:270:13:virtual StepperMotor::~StepperMotor()	16	static
+../Core/Inc/Component.h:56:7:constexpr Component::Component()	16	static
+../Core/Inc/StepperMotor.h:56:7:constexpr StepperMotor::StepperMotor()	16	static
+../Core/Inc/L6470.h:115:5:L6470::L6470(GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, SPI_HandleTypeDef*)	24	static
+../Core/Inc/L6470.h:141:13:L6470::~L6470()	16	static
+../Core/Inc/L6470.h:141:13:virtual L6470::~L6470()	16	static
+../Core/Inc/L6470.h:171:17:virtual int L6470::init(void*)	16	static
+../Core/Inc/L6470.h:181:17:virtual int L6470::read_id(uint8_t*)	16	static
+../Core/Inc/L6470.h:191:26:virtual unsigned int L6470::get_status()	16	static
+../Core/Inc/L6470.h:227:26:virtual unsigned int L6470::get_parameter(unsigned int)	16	static
+../Core/Inc/L6470.h:237:24:virtual int L6470::get_position()	16	static
+../Core/Inc/L6470.h:247:24:virtual int L6470::get_mark()	16	static
+../Core/Inc/L6470.h:257:26:virtual unsigned int L6470::get_speed()	16	static
+../Core/Inc/L6470.h:267:26:virtual unsigned int L6470::get_max_speed()	16	static
+../Core/Inc/L6470.h:277:26:virtual unsigned int L6470::get_min_speed()	16	static
+../Core/Inc/L6470.h:287:26:virtual unsigned int L6470::get_acceleration()	16	static
+../Core/Inc/L6470.h:297:26:virtual unsigned int L6470::get_deceleration()	16	static
+../Core/Inc/L6470.h:307:25:virtual StepperMotor::direction_t L6470::get_direction()	16	static
+../Core/Inc/L6470.h:367:18:virtual void L6470::set_parameter(unsigned int, unsigned int)	24	static
+../Core/Inc/L6470.h:377:18:virtual void L6470::set_home()	16	static
+../Core/Inc/L6470.h:387:18:virtual void L6470::set_mark()	16	static
+../Core/Inc/L6470.h:397:18:virtual void L6470::set_mark(int)	16	static
+../Core/Inc/L6470.h:407:18:virtual bool L6470::set_max_speed(unsigned int)	16	static
+../Core/Inc/L6470.h:418:18:virtual bool L6470::set_min_speed(unsigned int)	16	static
+../Core/Inc/L6470.h:429:18:virtual bool L6470::set_acceleration(unsigned int)	16	static
+../Core/Inc/L6470.h:440:18:virtual bool L6470::set_deceleration(unsigned int)	16	static
+../Core/Inc/L6470.h:455:18:virtual bool L6470::set_step_mode(StepperMotor::step_mode_t)	16	static
+../Core/Inc/L6470.h:470:18:virtual void L6470::go_to(int)	16	static
+../Core/Inc/L6470.h:481:18:virtual void L6470::go_to(int, StepperMotor::direction_t)	32	static
+../Core/Inc/L6470.h:491:18:virtual void L6470::go_home()	16	static
+../Core/Inc/L6470.h:501:18:virtual void L6470::go_mark()	16	static
+../Core/Inc/L6470.h:518:18:virtual void L6470::go_until(eL6470_ActId_t, StepperMotor::direction_t, unsigned int)	32	static
+../Core/Inc/L6470.h:528:18:virtual void L6470::run(StepperMotor::direction_t)	24	static
+../Core/Inc/L6470.h:539:18:virtual void L6470::run(StepperMotor::direction_t, unsigned int)	32	static
+../Core/Inc/L6470.h:550:18:virtual void L6470::move(StepperMotor::direction_t, unsigned int)	24	static
+../Core/Inc/L6470.h:561:18:virtual void L6470::soft_stop()	16	static
+../Core/Inc/L6470.h:571:18:virtual void L6470::hard_stop()	16	static
+../Core/Inc/L6470.h:582:18:virtual void L6470::soft_hiz()	16	static
+../Core/Inc/L6470.h:592:18:virtual void L6470::hard_hiz()	16	static
+../Core/Inc/L6470.h:602:18:virtual void L6470::wait_while_active()	16	static
+../Core/Inc/L6470.h:614:18:virtual void L6470::step_clock(StepperMotor::direction_t)	16	static
+../Core/Inc/L6470.h:630:18:virtual void L6470::release_sw(eL6470_ActId_t, StepperMotor::direction_t)	16	static
+../Core/Inc/L6470.h:640:18:virtual void L6470::reset_device()	16	static
+../Core/Inc/L6470.h:651:18:virtual void L6470::prepare_get_status()	16	static
+../Core/Inc/L6470.h:689:18:virtual void L6470::prepare_get_parameter(unsigned int)	16	static
+../Core/Inc/L6470.h:701:18:virtual void L6470::prepare_get_position()	16	static
+../Core/Inc/L6470.h:713:18:virtual void L6470::prepare_get_mark()	16	static
+../Core/Inc/L6470.h:725:18:virtual void L6470::prepare_get_speed()	16	static
+../Core/Inc/L6470.h:737:18:virtual void L6470::prepare_get_max_speed()	16	static
+../Core/Inc/L6470.h:749:18:virtual void L6470::prepare_get_min_speed()	16	static
+../Core/Inc/L6470.h:761:18:virtual void L6470::prepare_get_acceleration()	16	static
+../Core/Inc/L6470.h:773:18:virtual void L6470::prepare_get_deceleration()	16	static
+../Core/Inc/L6470.h:785:18:virtual void L6470::prepare_get_direction()	16	static
+../Core/Inc/L6470.h:852:18:virtual void L6470::prepare_set_parameter(unsigned int, unsigned int)	24	static
+../Core/Inc/L6470.h:865:18:virtual void L6470::prepare_set_home()	16	static
+../Core/Inc/L6470.h:878:18:virtual void L6470::prepare_set_mark()	16	static
+../Core/Inc/L6470.h:896:18:virtual void L6470::prepare_set_mark(int)	16	static
+../Core/Inc/L6470.h:908:18:virtual void L6470::prepare_set_speed(unsigned int)	16	static
+../Core/Inc/L6470.h:920:18:virtual void L6470::prepare_set_max_speed(unsigned int)	16	static
+../Core/Inc/L6470.h:932:18:virtual void L6470::prepare_set_min_speed(unsigned int)	16	static
+../Core/Inc/L6470.h:944:18:virtual void L6470::prepare_set_acceleration(unsigned int)	16	static
+../Core/Inc/L6470.h:956:18:virtual void L6470::prepare_set_deceleration(unsigned int)	16	static
+../Core/Inc/L6470.h:968:18:virtual void L6470::prepare_go_to(int)	16	static
+../Core/Inc/L6470.h:982:18:virtual void L6470::prepare_go_to(int, StepperMotor::direction_t)	32	static
+../Core/Inc/L6470.h:994:18:virtual void L6470::prepare_go_home()	16	static
+../Core/Inc/L6470.h:1006:18:virtual void L6470::prepare_go_mark()	16	static
+../Core/Inc/L6470.h:1025:18:virtual void L6470::prepare_go_until(eL6470_ActId_t, StepperMotor::direction_t, unsigned int)	32	static
+../Core/Inc/L6470.h:1038:18:virtual void L6470::prepare_run(StepperMotor::direction_t)	24	static
+../Core/Inc/L6470.h:1052:18:virtual void L6470::prepare_run(StepperMotor::direction_t, unsigned int)	32	static
+../Core/Inc/L6470.h:1066:18:virtual void L6470::prepare_move(StepperMotor::direction_t, unsigned int)	24	static
+../Core/Inc/L6470.h:1078:18:virtual void L6470::prepare_soft_stop()	16	static
+../Core/Inc/L6470.h:1090:18:virtual void L6470::prepare_hard_stop()	16	static
+../Core/Inc/L6470.h:1104:18:virtual void L6470::prepare_soft_hiz()	16	static
+../Core/Inc/L6470.h:1116:18:virtual void L6470::prepare_hard_hiz()	16	static
+../Core/Inc/L6470.h:1130:18:virtual void L6470::prepare_step_clock(StepperMotor::direction_t)	16	static
+../Core/Inc/L6470.h:1148:18:virtual void L6470::prepare_release_sw(eL6470_ActId_t, StepperMotor::direction_t)	16	static
+../Core/Inc/L6470.h:1160:18:virtual void L6470::prepare_reset_device()	16	static
+../Core/Inc/L6470.h:1172:14:uint8_t* L6470::perform_prepared_actions()	16	static
+../Core/Inc/L6470.h:1182:23:L6470::prepared_action_t L6470::get_prepared_action()	16	static
+../Core/Inc/L6470.h:1193:13:int32_t L6470::get_result(uint8_t*)	16	static
+../Core/Inc/L6470.h:1340:9:int L6470::L6470_round(float)	16	static
+../Core/Inc/XNucleoIHM02A1.h:121:23:virtual uint32_t* XNucleoIHM02A1::perform_prepared_actions()	40	static
+../Core/Src/XNucleoIHM02A1.cpp:72:1:XNucleoIHM02A1::XNucleoIHM02A1(L6470_init_t*, L6470_init_t*, SPI_HandleTypeDef*, GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t)	40	static,ignoring_inline_asm
+../Core/Src/XNucleoIHM02A1.cpp:109:6:bool XNucleoIHM02A1::init()	16	static
+../Core/Src/XNucleoIHM02A1.cpp:166:6:bool XNucleoIHM02A1::init_L6470_0()	16	static
+../Core/Src/XNucleoIHM02A1.cpp:180:6:bool XNucleoIHM02A1::init_L6470_1()	16	static

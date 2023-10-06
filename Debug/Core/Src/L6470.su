@@ -1,0 +1,74 @@
+../Core/Inc/L6470.h:1395:14:status_t L6470::ReadWrite(uint8_t*, uint8_t*, uint16_t)	32	static
+../Core/Inc/L6470.h:1423:10:void L6470::L6470_SPI_Communication(uint8_t*, uint8_t*, uint16_t, uint32_t)	24	static
+../Core/Src/L6470.cpp:165:6:void L6470::L6470_ResetAppCmdPkg(sL6470_AppCmdPkg_t*)	24	static
+../Core/Src/L6470.cpp:188:6:void L6470::L6470_FillAppCmdPkg(sL6470_AppCmdPkg_t*, eL6470_AppCmdId_t, uint32_t, uint32_t, uint32_t)	24	static
+../Core/Src/L6470.cpp:207:6:void L6470::L6470_PrepareAppCmdPkg(sL6470_AppCmdPkg_t*, eL6470_AppCmdId_t, uint32_t, uint32_t, uint32_t)	32	static
+../Core/Src/L6470.cpp:225:6:void L6470::L6470_PrepareDaisyChainCommand(sL6470_AppCmdPkg_t*, uint8_t*)	32	static
+../Core/Src/L6470.cpp:365:9:int32_t L6470::L6470_AbsPos_2_Position(uint32_t)	16	static
+../Core/Src/L6470.cpp:379:10:uint32_t L6470::L6470_Position_2_AbsPos(int32_t)	16	static
+../Core/Src/L6470.cpp:398:7:float L6470::L6470_Speed_2_Step_s(uint32_t)	16	static
+../Core/Src/L6470.cpp:409:10:uint32_t L6470::L6470_Step_s_2_Speed(float)	16	static
+../Core/Src/L6470.cpp:423:7:float L6470::L6470_Acc_2_Step_s2(uint16_t)	16	static
+../Core/Src/L6470.cpp:437:10:uint16_t L6470::L6470_Step_s2_2_Acc(float)	16	static
+../Core/Src/L6470.cpp:451:7:float L6470::L6470_Dec_2_Step_s2(uint16_t)	16	static
+../Core/Src/L6470.cpp:465:10:uint16_t L6470::L6470_Step_s2_2_Dec(float)	16	static
+../Core/Src/L6470.cpp:479:7:float L6470::L6470_MaxSpeed_2_Step_s(uint16_t)	16	static
+../Core/Src/L6470.cpp:493:10:uint16_t L6470::L6470_Step_s_2_MaxSpeed(float)	16	static
+../Core/Src/L6470.cpp:507:7:float L6470::L6470_MinSpeed_2_Step_s(uint16_t)	16	static
+../Core/Src/L6470.cpp:521:10:uint16_t L6470::L6470_Step_s_2_MinSpeed(float)	16	static
+../Core/Src/L6470.cpp:535:7:float L6470::L6470_FsSpd_2_Step_s(uint16_t)	16	static
+../Core/Src/L6470.cpp:549:10:uint16_t L6470::L6470_Step_s_2_FsSpd(float)	16	static
+../Core/Src/L6470.cpp:563:7:float L6470::L6470_IntSpeed_2_Step_s(uint16_t)	16	static
+../Core/Src/L6470.cpp:577:10:uint16_t L6470::L6470_Step_s_2_IntSpeed(float)	16	static
+../Core/Src/L6470.cpp:591:7:float L6470::L6470_StSlp_2_s_Step(uint8_t)	16	static
+../Core/Src/L6470.cpp:605:9:uint8_t L6470::L6470_s_Step_2_StSlp(float)	24	static
+../Core/Src/L6470.cpp:619:7:float L6470::L6470_FnSlpAcc_2_s_Step(uint8_t)	16	static
+../Core/Src/L6470.cpp:633:9:uint8_t L6470::L6470_s_Step_2_FnSlpAcc(float)	24	static
+../Core/Src/L6470.cpp:647:7:float L6470::L6470_FnSlpDec_2_s_Step(uint8_t)	16	static
+../Core/Src/L6470.cpp:661:9:uint8_t L6470::L6470_s_Step_2_FnSlpDec(float)	24	static
+../Core/Src/L6470.cpp:675:7:float L6470::L6470_OcdTh_2_mA(uint8_t)	16	static
+../Core/Src/L6470.cpp:689:9:uint8_t L6470::L6470_mA_2_OcdTh(float)	32	static
+../Core/Src/L6470.cpp:713:7:float L6470::L6470_StallTh_2_mA(uint8_t)	16	static
+../Core/Src/L6470.cpp:727:9:uint8_t L6470::L6470_mA_2_StallTh(float)	32	static
+../Core/Src/L6470.cpp:758:6:void L6470::L6470_SetParam(eL6470_RegId_t, uint32_t)	32	static
+../Core/Src/L6470.cpp:772:10:uint32_t L6470::L6470_GetParam(eL6470_RegId_t)	32	static
+../Core/Src/L6470.cpp:794:6:void L6470::L6470_Run(eL6470_DirId_t, uint32_t)	32	static
+../Core/Src/L6470.cpp:806:6:void L6470::L6470_StepClock(eL6470_DirId_t)	24	static
+../Core/Src/L6470.cpp:819:6:void L6470::L6470_Move(eL6470_DirId_t, uint32_t)	32	static
+../Core/Src/L6470.cpp:831:6:void L6470::L6470_GoTo(uint32_t)	24	static
+../Core/Src/L6470.cpp:847:6:void L6470::L6470_GoToDir(eL6470_DirId_t, uint32_t)	32	static
+../Core/Src/L6470.cpp:865:6:void L6470::L6470_GoUntil(eL6470_ActId_t, eL6470_DirId_t, uint32_t)	32	static
+../Core/Src/L6470.cpp:879:6:void L6470::L6470_ReleaseSW(eL6470_ActId_t, eL6470_DirId_t)	24	static
+../Core/Src/L6470.cpp:891:6:void L6470::L6470_GoHome()	24	static
+../Core/Src/L6470.cpp:903:6:void L6470::L6470_GoMark()	24	static
+../Core/Src/L6470.cpp:914:6:void L6470::L6470_ResetPos()	24	static
+../Core/Src/L6470.cpp:925:6:void L6470::L6470_ResetDevice()	24	static
+../Core/Src/L6470.cpp:938:6:void L6470::L6470_SoftStop()	24	static
+../Core/Src/L6470.cpp:949:6:void L6470::L6470_HardStop()	24	static
+../Core/Src/L6470.cpp:962:6:void L6470::L6470_SoftHiZ()	24	static
+../Core/Src/L6470.cpp:973:6:void L6470::L6470_HardHiZ()	24	static
+../Core/Src/L6470.cpp:986:10:uint16_t L6470::L6470_GetStatus()	32	static
+../Core/Src/L6470.cpp:1015:6:void L6470::L6470_PrepareSetParam(eL6470_RegId_t, uint32_t)	32	static
+../Core/Src/L6470.cpp:1031:6:void L6470::L6470_PrepareGetParam(eL6470_RegId_t)	24	static
+../Core/Src/L6470.cpp:1045:6:void L6470::L6470_PrepareRun(eL6470_DirId_t, uint32_t)	32	static
+../Core/Src/L6470.cpp:1058:6:void L6470::L6470_PrepareStepClock(eL6470_DirId_t)	24	static
+../Core/Src/L6470.cpp:1072:6:void L6470::L6470_PrepareMove(eL6470_DirId_t, uint32_t)	32	static
+../Core/Src/L6470.cpp:1085:6:void L6470::L6470_PrepareGoTo(uint32_t)	24	static
+../Core/Src/L6470.cpp:1099:6:void L6470::L6470_PrepareGoToDir(eL6470_DirId_t, uint32_t)	32	static
+../Core/Src/L6470.cpp:1114:6:void L6470::L6470_PrepareGoUntil(eL6470_ActId_t, eL6470_DirId_t, uint32_t)	32	static
+../Core/Src/L6470.cpp:1128:6:void L6470::L6470_PrepareReleaseSW(eL6470_ActId_t, eL6470_DirId_t)	24	static
+../Core/Src/L6470.cpp:1140:6:void L6470::L6470_PrepareGoHome()	24	static
+../Core/Src/L6470.cpp:1152:6:void L6470::L6470_PrepareGoMark()	24	static
+../Core/Src/L6470.cpp:1164:6:void L6470::L6470_PrepareResetPos()	24	static
+../Core/Src/L6470.cpp:1176:6:void L6470::L6470_PrepareResetDevice()	24	static
+../Core/Src/L6470.cpp:1188:6:void L6470::L6470_PrepareSoftStop()	24	static
+../Core/Src/L6470.cpp:1200:6:void L6470::L6470_PrepareHardStop()	24	static
+../Core/Src/L6470.cpp:1212:6:void L6470::L6470_PrepareSoftHiZ()	24	static
+../Core/Src/L6470.cpp:1224:6:void L6470::L6470_PrepareHardHiZ()	24	static
+../Core/Src/L6470.cpp:1236:6:void L6470::L6470_PrepareGetStatus()	24	static
+../Core/Src/L6470.cpp:1251:10:uint8_t* L6470::L6470_PerformPreparedApplicationCommand()	16	static
+../Core/Src/L6470.cpp:1264:6:void L6470::L6470_DaisyChainCommand(uint8_t*, uint8_t*)	40	static,ignoring_inline_asm
+../Core/Src/L6470.cpp:1290:10:uint32_t L6470::L6470_ExtractReturnedData(uint8_t*, uint8_t)	32	static
+../Core/Src/L6470.cpp:1313:9:uint8_t L6470::L6470_CheckStatusRegisterFlag(uint8_t)	24	static
+../Core/Src/L6470.cpp:1375:10:uint8_t* L6470::L6470_GetRegisterName(uint8_t)	16	static
+../Core/Src/L6470.cpp:1391:10:status_t L6470::L6470_Config(void*)	32	static
