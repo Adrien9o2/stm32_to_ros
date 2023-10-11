@@ -1,41 +1,3 @@
-/**
- ******************************************************************************
- * @file       L6470_def.h
- * @date       01/10/2014 12:00:00
- * @brief      This file contains definitions, exported variables and function
- *             prototypes related to the L6470.
- ******************************************************************************
- *
- * COPYRIGHT(c) 2014 STMicroelectronics
- *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
- *   1. Redistributions of source code must retain the above copyright notice,
- *      this list of conditions and the following disclaimer.
- *   2. Redistributions in binary form must reproduce the above copyright notice,
- *      this list of conditions and the following disclaimer in the documentation
- *      and/or other materials provided with the distribution.
- *   3. Neither the name of STMicroelectronics nor the names of its contributors
- *      may be used to endorse or promote products derived from this software
- *      without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- ******************************************************************************
- */
-
-
-/* Define to prevent recursive inclusion -------------------------------------*/
-
 #ifndef __L6470_H
 #define __L6470_H
 
@@ -201,17 +163,7 @@ typedef struct {
 /** 
  * @brief  L6470 driver initialization structure definition.
  */
-/* ACTION --------------------------------------------------------------------*
- * Declare here the component's initialization structure, if any, one         *
- * variable per line without initialization.                                  *
- *                                                                            *
- * Example:                                                                   *
- *   typedef struct                                                           *
- *   {                                                                        *
- *     int frequency;                                                         *
- *     int update_mode;                                                       *
- *   } COMPONENT_Init_t;                                                      *
- *----------------------------------------------------------------------------*/
+
 typedef struct
 {
   float     motorvoltage;           //!< motor supply voltage in V
@@ -243,19 +195,6 @@ typedef struct
 /** 
  * @brief  L6470 driver data structure definition.
  */ 
-/* ACTION --------------------------------------------------------------------*
- * Declare here the structure of component's data, if any, one variable per   *
- * line without initialization.                                               *
- *                                                                            *
- * Example:                                                                   *
- *   typedef struct                                                           *
- *   {                                                                        *
- *       int T0_out;                                                          *
- *       int T1_out;                                                          *
- *       float T0_degC;                                                       *
- *       float T1_degC;                                                       *
- *   } COMPONENT_Data_t;                                                      *
- *----------------------------------------------------------------------------*/
 typedef struct
 {
   uint8_t L6470_Id;                                                                  //!< The L6470 identifier inside the daisy chain
@@ -271,6 +210,16 @@ typedef struct
   sL6470_StatusRegister_t *pL6470_StatusRegister; /* = &L6470_StatusRegister; */     //!< Pointer to the L6470_StatusRegister variable
 } L6470_Data_t;
 
+/**
+ * @brief  Component's Status enumerator definition.
+ */
+typedef enum
+{
+    COMPONENT_OK = 0,
+    COMPONENT_ERROR,
+    COMPONENT_TIMEOUT,
+    COMPONENT_NOT_IMPLEMENTED
+} status_t;
 
 /* Functions -----------------------------------------------------------------*/
 

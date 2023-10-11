@@ -64,11 +64,11 @@ void MsgHandler::process_rxclpt_callback()
 				ongoing_fetch = true;
 				ack_msg_print(msg_len);
 				break;
-			case SerialID::MSG_DATA_1:
+			case SerialID::MSG_MOTOR_SPEEDS:
 				if(msg_len == sizeof(float))
 				{
 					ongoing_fetch = true;
-					ack_msg_data_1();
+					ack_msg_motor_speeds();
 				}
 				break;
 			default:
@@ -83,8 +83,8 @@ void MsgHandler::process_rxclpt_callback()
 			case SerialID::MSG_PRINT:
 				process_received_msg_print(incoming_data->get_data(),msg_len);
 				break;
-			case SerialID::MSG_DATA_1:
-				process_received_msg_data_1(incoming_data->get_data());
+			case SerialID::MSG_MOTOR_SPEEDS:
+				process_received_msg_motor_speeds(incoming_data->get_data());
 				break;
 			default:
 				break;
@@ -111,10 +111,10 @@ void MsgHandler::send_print(const char* msg)
 
 }
 
-void MsgHandler::send_float(float float_to_send)
+void MsgHandler::send_motor_speeds(float* motor_speeds)
 {
-	tx_msg_list.push_back(std::make_shared<HeaderClass>(SerialID::MSG_DATA_1,sizeof(float)));
-	tx_msg_list.push_back(std::make_shared<PayloadClass>(&float_to_send,sizeof(float)));
+	tx_msg_list.push_back(std::make_shared<HeaderClass>(SerialID::MSG_MOTOR_SPEEDS,4*sizeof(float)));
+	tx_msg_list.push_back(std::make_shared<PayloadClass>(motor_speeds,4*sizeof(float)));
 	if( tx_msg_list.size() == 2)
 	{
 		transmit_front_msg();
@@ -140,13 +140,13 @@ void MsgHandler::receive_data_header()
 	HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin, GPIO_PinState::GPIO_PIN_RESET);
 	HAL_UART_Receive_DMA(huart, rxHeader.get_data(), rxHeader.get_data_size());
 }
-void MsgHandler::ack_msg_data_1()
+void MsgHandler::ack_msg_motor_speeds()
 {
 	float dummy_data_1 = 0.0;
-	incoming_data = std::make_unique<PayloadClass>(&dummy_data_1,sizeof(float));
+	incoming_data = std::make_unique<PayloadClass>(&dummy_data_1,4*sizeof(float));
 	txSingleack.get_data()[0] = SerialID::MSG_ACK;
-	txSingleack.get_data()[1] = SerialID::MSG_DATA_1;
-	txSingleack.get_data()[2] = sizeof(float);
+	txSingleack.get_data()[1] = SerialID::MSG_MOTOR_SPEEDS;
+	txSingleack.get_data()[2] = 4*sizeof(float);
 	HAL_UART_Transmit_DMA(huart, txSingleack.get_data(), txSingleack.get_data_size());
 
 }
@@ -167,14 +167,27 @@ void MsgHandler::receive_data()
 	HAL_UART_Receive_DMA(huart, incoming_data->get_data(), incoming_data->get_data_size());
 }
 
-void MsgHandler::process_received_msg_data_1(uint8_t * data)
+void MsgHandler::process_received_msg_motor_speeds(uint8_t * data)
 {
-	float* float_ptr = reinterpret_cast<float*>(data);
-	char msg[50];
-	sprintf(msg,"received : %f",*float_ptr);
-	send_print(msg);
-
+	memcpy(motor_speeds,data,4*sizeof(float));
+	received_motor_speeds = true;
 }
+
+bool MsgHandler::get_received_motor_speeds(float* to_fill_motor_speeds)
+{
+	if( received_motor_speeds )
+	{
+		if( motor_speeds != NULL)
+		{
+			memcpy(to_fill_motor_speeds,motor_speeds,4*sizeof(float));
+			received_motor_speeds = false;
+			return true;
+		}
+	}
+	return false;
+}
+
+
 void MsgHandler::process_received_msg_print(uint8_t * data, uint8_t msg_len)
 {
     char* charPtr = reinterpret_cast<char*>(data);

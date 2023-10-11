@@ -1,106 +1,235 @@
-/**
- ******************************************************************************
- * @file    L6470.h
- * @author  Davide Aliprandi, STMicroelectronics
- * @version V1.0.0
- * @date    November 12th, 2015
- * @brief   This file contains the class of an L6470 Motor Control component.
- ******************************************************************************
- *
- * COPYRIGHT(c) 2014 STMicroelectronics
- *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
- *   1. Redistributions of source code must retain the above copyright notice,
- *      this list of conditions and the following disclaimer.
- *   2. Redistributions in binary form must reproduce the above copyright notice,
- *      this list of conditions and the following disclaimer in the documentation
- *      and/or other materials provided with the distribution.
- *   3. Neither the name of STMicroelectronics nor the names of its contributors
- *      may be used to endorse or promote products derived from this software
- *      without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- ******************************************************************************
- */
-
-
-/* Generated with STM32CubeTOO -----------------------------------------------*/
-
-
-/* Revision ------------------------------------------------------------------*/
-/*
-    Repository:       http://svn.x-nucleodev.codex.cro.st.com/svnroot/X-NucleoDev
-    Branch/Trunk/Tag: trunk
-    Based on:         X-CUBE-SPN2/trunk/Drivers/BSP/Components/L6470/L6470.h
-    Revision:         0
-*/
-
-
-/* Define to prevent recursive inclusion -------------------------------------*/
-
 #ifndef __L6470_CLASS_H
 #define __L6470_CLASS_H
 
-
-/* Includes ------------------------------------------------------------------*/
+/* Includes -------------------------------------------------------------------*/
 #include <cstring>
-/* ACTION 1 ------------------------------------------------------------------*
- * Include here platform specific header files.                               *
- *----------------------------------------------------------------------------*/
-#include "main.h"
-/* ACTION 2 ------------------------------------------------------------------*
- * Include here component specific header files.                              *
- *----------------------------------------------------------------------------*/
-#include "L6470_def.h"
-/* ACTION 3 ------------------------------------------------------------------*
- * Include here interface specific header files.                              *
- *                                                                            *
- * Example:                                                                   *
- *   #include "HumiditySensor.h"                                              *
- *   #include "TemperatureSensor.h"                                           *
- *----------------------------------------------------------------------------*/
-#include "StepperMotor.h"
+#include <type_traits>
+#include <stdexcept>
 
+#include "main.h"
+
+#include "L6470_def.h"
+
+#include "StepperMotor.h"
+using namespace StepperMotor;
 
 /* Classes -------------------------------------------------------------------*/
+
+
+
+class shield_1
+{
+	public:
+		shield_1(){count++;}
+		~shield_1() = default;
+		static const uint8_t shield_nbr = 1;
+		static uint8_t count;
+};
+
+class shield_2
+{
+public:
+	shield_2(){count++;}
+	~shield_2() = default;
+	static const uint8_t shield_nbr = 2;
+	static uint8_t count;
+};
+
+class shield_3
+{
+public:
+	shield_3(){count++;}
+	~shield_3() = default;
+	static const uint8_t shield_nbr = 3;
+	static uint8_t count;
+};
+
+typedef enum
+{
+    PREPARED_NO_ACTION = 0,
+    PREPARED_GET_POSITION,
+    PREPARED_GET_MARK,
+    PREPARED_GET_SPEED,
+    PREPARED_GET_MAX_SPEED,
+    PREPARED_GET_MIN_SPEED,
+    PREPARED_GET_ACCELERATION,
+    PREPARED_GET_DECELERATION,
+    PREPARED_GET_DIRECTION,
+    PREPARED_SET_MARK
+} prepared_action_t;
+
+
+class abstractL6470
+{
+	public:
+		abstractL6470();
+		virtual ~abstractL6470();
+	    virtual int init(void *init) = 0;
+	    virtual unsigned int get_status(void) = 0;
+	    virtual unsigned int get_parameter(unsigned int parameter) = 0;
+	    virtual signed int get_position(void) = 0;
+	    virtual signed int get_mark(void) = 0;
+	    virtual unsigned int get_speed(void) = 0;
+	    virtual unsigned int get_max_speed(void) = 0;
+	    virtual unsigned int get_min_speed(void) = 0;
+	    virtual unsigned int get_acceleration(void) = 0;
+	    virtual unsigned int get_deceleration(void) = 0;
+	    virtual StepperMotor::direction_t get_direction(void) = 0;
+	    virtual void set_parameter(unsigned int parameter, unsigned int value) = 0;
+	    virtual void set_home(void) = 0;
+	    virtual void set_mark(void) = 0;
+	    virtual void set_mark(signed int position) = 0;
+	    virtual bool set_max_speed(unsigned int speed) = 0;
+	    virtual bool set_min_speed(unsigned int speed) = 0;
+	    virtual bool set_acceleration(unsigned int acceleration) = 0;
+	    virtual bool set_deceleration(unsigned int deceleration) = 0;
+	    virtual bool set_step_mode(StepperMotor::step_mode_t step_mode) = 0;
+	    virtual void go_to(signed int position) = 0;
+	    virtual void go_to(signed int position, StepperMotor::direction_t direction) = 0;
+	    virtual void go_home(void) = 0;
+	    virtual void go_mark(void) = 0;
+	    virtual void go_until(eL6470_ActId_t action, StepperMotor::direction_t direction, unsigned int speed) = 0;
+	    virtual void run(StepperMotor::direction_t direction) = 0;
+	    virtual void run(StepperMotor::direction_t direction, unsigned int speed) = 0;
+	    virtual void move(StepperMotor::direction_t direction, unsigned int steps) = 0;
+	    virtual void soft_stop(void) = 0;
+	    virtual void hard_stop(void) = 0;
+	    virtual void soft_hiz(void) = 0;
+	    virtual void hard_hiz(void) = 0;
+	    virtual void wait_while_active(void) = 0;
+	    virtual void step_clock(StepperMotor::direction_t direction) = 0;
+	    virtual void release_sw(eL6470_ActId_t action, StepperMotor::direction_t direction) = 0;
+	    virtual void reset_device(void) = 0;
+	    virtual void prepare_get_status(void) = 0;
+	    virtual void prepare_get_parameter(unsigned int parameter) = 0;
+	    virtual void prepare_get_position(void) = 0;
+	    virtual void prepare_get_mark(void) = 0;
+	    virtual void prepare_get_speed(void) = 0;
+	    virtual void prepare_get_max_speed(void) = 0;
+	    virtual void prepare_get_min_speed(void) = 0;
+	    virtual void prepare_get_acceleration(void) = 0;
+	    virtual void prepare_get_deceleration(void) = 0;
+	    virtual void prepare_get_direction(void) = 0;
+	    virtual void prepare_set_parameter(unsigned int parameter, unsigned int value) = 0;
+	    virtual void prepare_set_home(void) = 0;
+	    virtual void prepare_set_mark(void) = 0;
+	    virtual void prepare_set_mark(signed int position) = 0;
+	    virtual void prepare_set_speed(unsigned int speed) = 0;
+	    virtual void prepare_set_max_speed(unsigned int speed) = 0;
+	    virtual void prepare_set_min_speed(unsigned int speed) = 0;
+	    virtual void prepare_set_acceleration(unsigned int acceleration) = 0;
+	    virtual void prepare_set_deceleration(unsigned int deceleration) = 0;
+	    virtual void prepare_go_to(signed int position) = 0;
+	    virtual void prepare_go_to(signed int position, StepperMotor::direction_t direction) = 0;
+	    virtual void prepare_go_home(void) = 0;
+	    virtual void prepare_go_mark(void) = 0;
+	    virtual void prepare_go_until(eL6470_ActId_t L6470_ActId, StepperMotor::direction_t direction, unsigned int speed) = 0;
+	    virtual void prepare_run(StepperMotor::direction_t direction) = 0;
+	    virtual void prepare_run(StepperMotor::direction_t direction, unsigned int speed) = 0;
+	    virtual void prepare_move(StepperMotor::direction_t direction, unsigned int steps) = 0;
+	    virtual void prepare_soft_stop(void) = 0;
+	    virtual void prepare_hard_stop(void) = 0;
+	    virtual void prepare_soft_hiz(void) = 0;
+	    virtual void prepare_hard_hiz(void) = 0;
+	    virtual void prepare_step_clock(StepperMotor::direction_t direction) = 0;
+	    virtual void prepare_release_sw(eL6470_ActId_t action, StepperMotor::direction_t direction) = 0;
+	    virtual void prepare_reset_device(void) = 0;
+	    virtual uint8_t* perform_prepared_actions(void) = 0;
+	    virtual prepared_action_t get_prepared_action(void) = 0;
+	    virtual int32_t get_result(uint8_t *raw_data) = 0;
+	    virtual void L6470_DISABLE(void) = 0;
+	protected:
+	    virtual int32_t  L6470_AbsPos_2_Position(uint32_t AbsPos) = 0;
+	    virtual uint32_t L6470_Position_2_AbsPos(int32_t Position) = 0;
+	    virtual float    L6470_Speed_2_Step_s(uint32_t Speed) = 0;
+	    virtual uint32_t L6470_Step_s_2_Speed(float Step_s) = 0;
+	    virtual float    L6470_Acc_2_Step_s2(uint16_t Acc) = 0;
+	    virtual uint16_t L6470_Step_s2_2_Acc(float Step_s2) = 0;
+	    virtual float    L6470_Dec_2_Step_s2(uint16_t Dec) = 0;
+	    virtual uint16_t L6470_Step_s2_2_Dec(float Step_s2) = 0;
+	    virtual float    L6470_MaxSpeed_2_Step_s(uint16_t MaxSpeed) = 0;
+	    virtual uint16_t L6470_Step_s_2_MaxSpeed(float Step_s) = 0;
+	    virtual float    L6470_MinSpeed_2_Step_s(uint16_t MinSpeed) = 0;
+	    virtual uint16_t L6470_Step_s_2_MinSpeed(float Step_s) = 0;
+	    virtual float    L6470_FsSpd_2_Step_s(uint16_t FsSpd) = 0;
+	    virtual uint16_t L6470_Step_s_2_FsSpd(float Step_s) = 0;
+	    virtual float    L6470_IntSpeed_2_Step_s(uint16_t IntSpeed) = 0;
+	    virtual uint16_t L6470_Step_s_2_IntSpeed(float Step_s) = 0;
+	    virtual float    L6470_StSlp_2_s_Step(uint8_t StSlp) = 0;
+	    virtual uint8_t  L6470_s_Step_2_StSlp(float s_Step) = 0;
+	    virtual float    L6470_FnSlpAcc_2_s_Step(uint8_t FnSlpAcc) = 0;
+	    virtual uint8_t  L6470_s_Step_2_FnSlpAcc(float s_Step) = 0;
+	    virtual float    L6470_FnSlpDec_2_s_Step(uint8_t FnSlpDec) = 0;
+	    virtual uint8_t  L6470_s_Step_2_FnSlpDec(float s_Step) = 0;
+	    virtual float    L6470_OcdTh_2_mA(uint8_t OcdTh) = 0;
+	    virtual uint8_t  L6470_mA_2_OcdTh(float mA) = 0;
+	    virtual float    L6470_StallTh_2_mA(uint8_t StallTh) = 0;
+	    virtual uint8_t  L6470_mA_2_StallTh(float mA) = 0;
+	    virtual status_t L6470_Config(void *init) = 0;
+	    virtual void     L6470_SetParam(eL6470_RegId_t L6470_RegId, uint32_t Value) = 0;
+	    virtual uint32_t L6470_GetParam(eL6470_RegId_t L6470_RegId) = 0;
+	    virtual void     L6470_Run(eL6470_DirId_t L6470_DirId, uint32_t Speed) = 0;
+	    virtual void     L6470_StepClock(eL6470_DirId_t L6470_DirId) = 0;
+	    virtual void     L6470_Move(eL6470_DirId_t L6470_DirId, uint32_t N_Step) = 0;
+	    virtual void     L6470_GoTo(uint32_t AbsPos) = 0;
+	    virtual void     L6470_GoToDir(eL6470_DirId_t L6470_DirId, uint32_t AbsPos) = 0;
+	    virtual void     L6470_GoUntil(eL6470_ActId_t L6470_ActId, eL6470_DirId_t L6470_DirId, uint32_t Speed) = 0;
+	    virtual void     L6470_ReleaseSW(eL6470_ActId_t L6470_ActId, eL6470_DirId_t L6470_DirId) = 0;
+	    virtual void     L6470_GoHome(void) = 0;
+	    virtual void     L6470_GoMark(void) = 0;
+	    virtual void     L6470_ResetPos(void) = 0;
+	    virtual void     L6470_ResetDevice(void) = 0;
+	    virtual void     L6470_SoftStop(void) = 0;
+	    virtual void     L6470_HardStop(void) = 0;
+	    virtual void     L6470_SoftHiZ(void) = 0;
+	    virtual void     L6470_HardHiZ(void) = 0;
+	    virtual uint16_t L6470_GetStatus(void) = 0;
+	    virtual void     L6470_PrepareSetParam(eL6470_RegId_t L6470_RegId, uint32_t Value) = 0;
+	    virtual void     L6470_PrepareGetParam(eL6470_RegId_t L6470_RegId) = 0;
+	    virtual void     L6470_PrepareRun(eL6470_DirId_t L6470_DirId, uint32_t Speed) = 0;
+	    virtual void     L6470_PrepareStepClock(eL6470_DirId_t L6470_DirId) = 0;
+	    virtual void     L6470_PrepareMove(eL6470_DirId_t L6470_DirId, uint32_t N_Step) = 0;
+	    virtual void     L6470_PrepareGoTo(uint32_t AbsPos) = 0;
+	    virtual void     L6470_PrepareGoToDir(eL6470_DirId_t L6470_DirId, uint32_t AbsPos) = 0;
+	    virtual void     L6470_PrepareGoUntil(eL6470_ActId_t L6470_ActId, eL6470_DirId_t L6470_DirId, uint32_t Speed) = 0;
+	    virtual void     L6470_PrepareReleaseSW(eL6470_ActId_t L6470_ActId, eL6470_DirId_t L6470_DirId) = 0;
+	    virtual void     L6470_PrepareGoHome(void) = 0;
+	    virtual void     L6470_PrepareGoMark(void) = 0;
+	    virtual void     L6470_PrepareResetPos(void) = 0;
+	    virtual void     L6470_PrepareResetDevice(void) = 0;
+	    virtual void     L6470_PrepareSoftStop(void) = 0;
+	    virtual void     L6470_PrepareHardStop(void) = 0;
+	    virtual void     L6470_PrepareSoftHiZ(void) = 0;
+	    virtual void     L6470_PrepareHardHiZ(void) = 0;
+	    virtual void     L6470_PrepareGetStatus(void) = 0;
+	    virtual uint8_t* L6470_PerformPreparedApplicationCommand(void) = 0;
+	    virtual void     L6470_DaisyChainCommand(uint8_t* pL6470_DaisyChainSpiTxStruct, uint8_t* pL6470_DaisyChainSpiRxStruct) = 0;
+	    virtual uint32_t L6470_ExtractReturnedData(uint8_t* pL6470_DaisyChainSpiRxStruct, uint8_t LengthByte) = 0;
+	    virtual uint8_t  L6470_CheckStatusRegisterFlag(uint8_t L6470_StatusRegisterFlagId) = 0;
+	    virtual uint8_t* L6470_GetRegisterName(uint8_t id) = 0;
+	    virtual void     L6470_ResetAppCmdPkg(sL6470_AppCmdPkg_t* pL6470_AppCmdPkg) = 0;
+	    virtual void     L6470_FillAppCmdPkg(sL6470_AppCmdPkg_t* pL6470_AppCmdPkg, eL6470_AppCmdId_t L6470_AppCmdId, uint32_t p1, uint32_t p2, uint32_t p3) = 0;
+	    virtual void     L6470_PrepareAppCmdPkg(sL6470_AppCmdPkg_t* pL6470_AppCmdPkg, eL6470_AppCmdId_t L6470_AppCmdId, uint32_t p1, uint32_t p2, uint32_t p3) = 0;
+	    virtual void     L6470_PrepareDaisyChainCommand(sL6470_AppCmdPkg_t* pL6470_AppCmdPkg, uint8_t* pL6470_DaisyChainSpiTxStruct) = 0;
+	    virtual int L6470_round(float f) = 0;
+	    virtual status_t Read(uint8_t* pBuffer, uint16_t NumBytesToRead) = 0;
+	    virtual status_t Write(uint8_t* pBuffer, uint16_t NumBytesToWrite) = 0;
+	    virtual status_t ReadWrite(uint8_t* pBufferToRead, uint8_t* pBufferToWrite, uint16_t NumBytes) = 0;
+	    virtual void L6470_SPI_Communication(uint8_t *pTxData, uint8_t *pRxData, uint16_t Size, uint32_t Timeout) = 0;
+
+
+		uint8_t shield_id;
+
+};
+
 
 /**
  * @brief Class representing a L6470 component.
  */
-class L6470 : public StepperMotor
+template <class shield_x>
+class L6470 : public abstractL6470
 {
 public:
-
-    /*** Public Component Related Types ***/
-
-    /**
-     * @brief Prepared Actions.
-     */
-    typedef enum
-    {
-        PREPARED_NO_ACTION = 0,
-        PREPARED_GET_POSITION,
-        PREPARED_GET_MARK,
-        PREPARED_GET_SPEED,
-        PREPARED_GET_MAX_SPEED,
-        PREPARED_GET_MIN_SPEED,
-        PREPARED_GET_ACCELERATION,
-        PREPARED_GET_DECELERATION,
-        PREPARED_GET_DIRECTION,
-        PREPARED_SET_MARK
-    } prepared_action_t;
-
 
     /*** Constructor and Destructor Methods ***/
 
@@ -112,16 +241,28 @@ public:
      * @param ssel_pin      pin name of the SSEL pin of the SPI device to be used for communication.
      * @param spi           SPI handler to be used for communication.
      */
-    L6470(GPIO_TypeDef* standby_reset_port, uint16_t standby_reset_pin,GPIO_TypeDef* ssel_port , uint16_t ssel_pin, SPI_HandleTypeDef *spi) : StepperMotor(), standby_reset_port(standby_reset_port), standby_reset_pin(standby_reset_pin), ssel_port(ssel_port),ssel_pin(ssel_pin) , spi(spi)
+    L6470(GPIO_TypeDef* standby_reset_port, uint16_t standby_reset_pin,GPIO_TypeDef* ssel_port , uint16_t ssel_pin, SPI_HandleTypeDef *spi) : standby_reset_port(standby_reset_port), standby_reset_pin(standby_reset_pin), ssel_port(ssel_port),ssel_pin(ssel_pin) , spi(spi)
     {
-        /* ACTION 4 ----------------------------------------------------------*
-         * Initialize here the component's member variables, one variable per *
-         * line.                                                              *
-         *                                                                    *
-         * Example:                                                           *
-         *   measure = 0;                                                     *
-         *   instance_id = number_of_instances++;                             *
-         *--------------------------------------------------------------------*/
+
+    	if(std::is_same<shield_x,shield_1>::value)
+    	{
+    		shield_id = 1;
+    		shield_1::count++;
+    	}
+    	else if (std::is_same<shield_x,shield_2>::value)
+    	{
+    		shield_id = 2;
+    		shield_2::count++;
+    	}
+    	else if (std::is_same<shield_x,shield_3>::value)
+    	{
+    		shield_id = 3;
+    		shield_3::count++;
+    	}
+    	else
+    	{
+    		throw std::runtime_error("template of L6470 must be shield_1, shield_2 or shield_3");
+    	}
         L6470_Register = &_L6470_Register[0];
         L6470_ApplicationCommand = &_L6470_ApplicationCommand[0];
         L6470_Direction = &_L6470_Direction[0];
@@ -138,31 +279,11 @@ public:
     /**
      * @brief Destructor.
      */
-    virtual ~L6470(void) {}
+    ~L6470(void) = default;
 
 
     /*** Public Component Related Methods ***/
 
-    /* ACTION 5 --------------------------------------------------------------*
-     * Implement here the component's public methods, as wrappers of the C    *
-     * component's functions.                                                 *
-     * They should be:                                                        *
-     *   + Methods with the same name of the C component's virtual table's    *
-     *     functions (1);                                                     *
-     *   + Methods with the same name of the C component's extended virtual   *
-     *     table's functions, if any (2).                                     *
-     *                                                                        *
-     * Example:                                                               *
-     *   virtual int get_value(float *p_data) //(1)                           *
-     *   {                                                                    *
-     *     return COMPONENT_get_value(float *pf_data);                        *
-     *   }                                                                    *
-     *                                                                        *
-     *   virtual int enable_feature(void) //(2)                               *
-     *   {                                                                    *
-     *     return COMPONENT_enable_feature();                                 *
-     *   }                                                                    *
-     *------------------------------------------------------------------------*/
     /**
      * @brief  Initializing the component.
      * @param  init Pointer to device specific initalization structure.
@@ -171,16 +292,6 @@ public:
     virtual int init(void *init)
     {
         return (int) L6470_Config((void *) init);
-    }
-
-    /**
-     * @brief  Getting the ID of the component.
-     * @param  id Pointer to an allocated variable to store the ID into.
-     * @retval "0" in case of success, an error code otherwise.
-     */
-    virtual int read_id(uint8_t *id)
-    {
-        return (int) 0;
     }
 
     /**
@@ -304,9 +415,9 @@ public:
      * @param  None.
      * @retval The direction of rotation.
      */
-    virtual direction_t get_direction(void)
+    virtual StepperMotor::direction_t get_direction(void)
     {
-        return (direction_t) (L6470_CheckStatusRegisterFlag((eL6470_StatusRegisterFlagId_t) DIR_ID) == 1 ? StepperMotor::FWD : StepperMotor::BWD);
+        return (StepperMotor::direction_t) (L6470_CheckStatusRegisterFlag((eL6470_StatusRegisterFlagId_t) DIR_ID) == 1 ? StepperMotor::FWD : StepperMotor::BWD);
     }
 
     /**
@@ -478,7 +589,7 @@ public:
      * @param  direction The direction of rotation.
      * @retval None.
      */
-    virtual void go_to(signed int position, direction_t direction)
+    virtual void go_to(signed int position, StepperMotor::direction_t direction)
     {
         L6470_GoToDir((eL6470_DirId_t) (direction == StepperMotor::FWD ? L6470_DIR_FWD_ID : L6470_DIR_REV_ID), (uint32_t) L6470_Position_2_AbsPos((int32_t) position));
     }
@@ -515,7 +626,7 @@ public:
      *           + L6470_ACT_RST_ID: the absolute position is reset;
      *           + L6470_ACT_CPY_ID: the absolute position is set as the marked position.
      */
-    virtual void go_until(eL6470_ActId_t action, direction_t direction, unsigned int speed)
+    virtual void go_until(eL6470_ActId_t action, StepperMotor::direction_t direction, unsigned int speed)
     {
         L6470_GoUntil((eL6470_ActId_t) action, (eL6470_DirId_t) (direction == StepperMotor::FWD ? L6470_DIR_FWD_ID : L6470_DIR_REV_ID), (unsigned int) L6470_Step_s_2_Speed((float) speed));
     }
@@ -525,7 +636,7 @@ public:
      * @param  direction The direction of rotation.
      * @retval None.
      */
-    virtual void run(direction_t direction)
+    virtual void run(StepperMotor::direction_t direction)
     {
         L6470_Run((eL6470_DirId_t) (direction == StepperMotor::FWD ? L6470_DIR_FWD_ID : L6470_DIR_REV_ID), (unsigned int) L6470_GetParam((eL6470_RegId_t) L6470_MAX_SPEED_ID));
     }
@@ -536,7 +647,7 @@ public:
      * @param  speed The speed value in pps.
      * @retval None.
      */
-    virtual void run(direction_t direction, unsigned int speed)
+    virtual void run(StepperMotor::direction_t direction, unsigned int speed)
     {
         L6470_Run((eL6470_DirId_t) (direction == StepperMotor::FWD ? L6470_DIR_FWD_ID : L6470_DIR_REV_ID), (unsigned int) L6470_Step_s_2_Speed((float) speed));
     }
@@ -547,7 +658,7 @@ public:
      * @param  steps The desired number of steps.
      * @retval None.
      */
-    virtual void move(direction_t direction, unsigned int steps)
+    virtual void move(StepperMotor::direction_t direction, unsigned int steps)
     {
         L6470_Move((eL6470_DirId_t) (direction == StepperMotor::FWD ? L6470_DIR_FWD_ID : L6470_DIR_REV_ID), (unsigned int) steps);
     }
@@ -611,7 +722,7 @@ public:
      * @warning Setting the step-clock mode implies first disabling the power bridge through
      *          the soft_hiz() method.
      */
-    virtual void step_clock(direction_t direction)
+    virtual void step_clock(StepperMotor::direction_t direction)
     {
         soft_hiz();
         L6470_StepClock((eL6470_DirId_t) (direction == StepperMotor::FWD ? L6470_DIR_FWD_ID : L6470_DIR_REV_ID));
@@ -627,7 +738,7 @@ public:
       *           + L6470_ACT_RST_ID: the absolute position is reset;
       *           + L6470_ACT_CPY_ID: the absolute position is set as the marked position.
       */
-    virtual void release_sw(eL6470_ActId_t action, direction_t direction)
+    virtual void release_sw(eL6470_ActId_t action, StepperMotor::direction_t direction)
     {
         L6470_ReleaseSW((eL6470_ActId_t) action, (eL6470_DirId_t) (direction == StepperMotor::FWD ? L6470_DIR_FWD_ID : L6470_DIR_REV_ID));
     }
@@ -979,7 +1090,7 @@ public:
      * @retval None.
      * @note   The command will be sent by issuing "perform_action()".
      */
-    virtual void prepare_go_to(signed int position, direction_t direction)
+    virtual void prepare_go_to(signed int position, StepperMotor::direction_t direction)
     {
         L6470_PrepareGoToDir((eL6470_DirId_t) (direction == StepperMotor::FWD ? L6470_DIR_FWD_ID : L6470_DIR_REV_ID), (uint32_t) L6470_Position_2_AbsPos((int32_t) position));
         prepared_action = PREPARED_NO_ACTION;
@@ -1022,7 +1133,7 @@ public:
      *           + L6470_ACT_RST_ID: the absolute position is reset;
      *           + L6470_ACT_CPY_ID: the absolute position is set as the marked position.
      */
-    virtual void prepare_go_until(eL6470_ActId_t L6470_ActId, direction_t direction, unsigned int speed)
+    virtual void prepare_go_until(eL6470_ActId_t L6470_ActId, StepperMotor::direction_t direction, unsigned int speed)
     {
         L6470_PrepareGoUntil((eL6470_ActId_t) L6470_ActId, (eL6470_DirId_t) (direction == StepperMotor::FWD ? L6470_DIR_FWD_ID : L6470_DIR_REV_ID), (unsigned int) L6470_Step_s_2_Speed((float) speed));
         prepared_action = PREPARED_NO_ACTION;
@@ -1035,7 +1146,7 @@ public:
      * @retval None.
      * @note   The command will be sent by issuing "perform_action()".
      */
-    virtual void prepare_run(direction_t direction)
+    virtual void prepare_run(StepperMotor::direction_t direction)
     {
         L6470_PrepareRun((eL6470_DirId_t) (direction == StepperMotor::FWD ? L6470_DIR_FWD_ID : L6470_DIR_REV_ID), (unsigned int) L6470_GetParam((eL6470_RegId_t) L6470_MAX_SPEED_ID));
         prepared_action = PREPARED_NO_ACTION;
@@ -1049,7 +1160,7 @@ public:
      * @retval None.
      * @note   The command will be sent by issuing "perform_action()".
      */
-    virtual void prepare_run(direction_t direction, unsigned int speed)
+    virtual void prepare_run(StepperMotor::direction_t direction, unsigned int speed)
     {
         L6470_PrepareRun((eL6470_DirId_t) (direction == StepperMotor::FWD ? L6470_DIR_FWD_ID : L6470_DIR_REV_ID), (unsigned int) L6470_Step_s_2_Speed((float) speed));
         prepared_action = PREPARED_NO_ACTION;
@@ -1063,7 +1174,7 @@ public:
      * @retval None.
      * @note   The command will be sent by issuing "perform_action()".
      */
-    virtual void prepare_move(direction_t direction, unsigned int steps)
+    virtual void prepare_move(StepperMotor::direction_t direction, unsigned int steps)
     {
         L6470_PrepareMove((eL6470_DirId_t) (direction == StepperMotor::FWD ? L6470_DIR_FWD_ID : L6470_DIR_REV_ID), (unsigned int) steps);
         prepared_action = PREPARED_NO_ACTION;
@@ -1127,7 +1238,7 @@ public:
      *          disable the power bridge through the soft_hiz() method.
      * @note    The command will be sent by issuing "perform_action()".
      */
-    virtual void prepare_step_clock(direction_t direction)
+    virtual void prepare_step_clock(StepperMotor::direction_t direction)
     {
         L6470_PrepareStepClock((eL6470_DirId_t) (direction == StepperMotor::FWD ? L6470_DIR_FWD_ID : L6470_DIR_REV_ID));
         prepared_action = PREPARED_NO_ACTION;
@@ -1145,7 +1256,7 @@ public:
       *           + L6470_ACT_RST_ID: the absolute position is reset;
       *           + L6470_ACT_CPY_ID: the absolute position is set as the marked position.
       */
-    virtual void prepare_release_sw(eL6470_ActId_t action, direction_t direction)
+    virtual void prepare_release_sw(eL6470_ActId_t action, StepperMotor::direction_t direction)
     {
         L6470_PrepareReleaseSW((eL6470_ActId_t) action, (eL6470_DirId_t) (direction == StepperMotor::FWD ? L6470_DIR_FWD_ID : L6470_DIR_REV_ID));
         prepared_action = PREPARED_NO_ACTION;
@@ -1215,7 +1326,7 @@ public:
                 return L6470_round(L6470_Dec_2_Step_s2(L6470_ExtractReturnedData(raw_data, L6470_Register[L6470_DEC_ID].LengthByte)));
 
             case PREPARED_GET_DIRECTION:
-                return (int32_t) (direction_t) (L6470_CheckStatusRegisterFlag((eL6470_StatusRegisterFlagId_t) DIR_ID) == 1 ? StepperMotor::FWD : StepperMotor::BWD);
+                return (int32_t) (StepperMotor::direction_t) (L6470_CheckStatusRegisterFlag((eL6470_StatusRegisterFlagId_t) DIR_ID) == 1 ? StepperMotor::FWD : StepperMotor::BWD);
 
             default:
             case PREPARED_NO_ACTION:
@@ -1242,23 +1353,7 @@ public:
 
 protected:
 
-    /*** Protected Component Related Methods ***/
 
-    /* ACTION 7 --------------------------------------------------------------*
-     * Declare here the component's specific methods.                         *
-     * They should be:                                                        *
-     *   + Methods with the same name of the C component's virtual table's    *
-     *     functions (1);                                                     *
-     *   + Methods with the same name of the C component's extended virtual   *
-     *     table's functions, if any (2);                                     *
-     *   + Helper methods, if any, like functions declared in the component's *
-     *     source files but not pointed by the component's virtual table (3). *
-     *                                                                        *
-     * Example:                                                               *
-     *   status_t COMPONENT_get_value(float *f);   //(1)                      *
-     *   status_t COMPONENT_enable_feature(void);  //(2)                      *
-     *   status_t COMPONENT_compute_average(void); //(3)                      *
-     *------------------------------------------------------------------------*/
     int32_t  L6470_AbsPos_2_Position(uint32_t AbsPos);
     uint32_t L6470_Position_2_AbsPos(int32_t Position);
     float    L6470_Speed_2_Step_s(uint32_t Speed);
@@ -1395,14 +1490,8 @@ protected:
     status_t ReadWrite(uint8_t* pBufferToRead, uint8_t* pBufferToWrite, uint16_t NumBytes)
     {
         HAL_GPIO_WritePin(ssel_port, ssel_pin, GPIO_PinState::GPIO_PIN_RESET);
-        HAL_StatusTypeDef status_transmit = HAL_SPI_Transmit(spi, (uint8_t *)pBufferToWrite, NumBytes, 100);
+        HAL_StatusTypeDef status_transmit = HAL_SPI_TransmitReceive(spi, pBufferToWrite, pBufferToRead , NumBytes, 1000);
         if( status_transmit != HAL_StatusTypeDef::HAL_OK)
-        {
-        	HAL_GPIO_WritePin(ssel_port, ssel_pin, GPIO_PinState::GPIO_PIN_SET);
-        	return COMPONENT_ERROR;
-        }
-        HAL_StatusTypeDef status_receive = HAL_SPI_Receive(spi, (uint8_t *)pBufferToRead, NumBytes, 100);
-        if( status_receive != HAL_StatusTypeDef::HAL_OK)
         {
         	HAL_GPIO_WritePin(ssel_port, ssel_pin, GPIO_PinState::GPIO_PIN_SET);
         	return COMPONENT_ERROR;
@@ -1411,76 +1500,23 @@ protected:
         return COMPONENT_OK;
     }
 
-    /* ACTION 8 --------------------------------------------------------------*
-     * Implement here other I/O methods beyond those already implemented      *
-     * above, which are declared extern within the component's header file.   *
-     *------------------------------------------------------------------------*/
 
-    /*
-     * Write and read bytes to/from the component through the SPI at the same time.
-     */
     void L6470_SPI_Communication(uint8_t *pTxData, uint8_t *pRxData, uint16_t Size, uint32_t Timeout)
     {
         ReadWrite(pRxData, pTxData, Size);
     }
 
 
-    /*** Component's Instance Variables ***/
 
-    /* ACTION 9 --------------------------------------------------------------*
-     * Declare here interrupt related variables, if needed.                   *
-     * Note that interrupt handling is platform dependent, see                *
-     * "Interrupt Related Methods" above.                                     *
-     *                                                                        *
-     * Example:                                                               *
-     *   + mbed:                                                              *
-     *     InterruptIn feature_irq;                                           *
-     *------------------------------------------------------------------------*/
-
-    /* ACTION 10 -------------------------------------------------------------*
-     * Declare here other pin related variables, if needed.                   *
-     *                                                                        *
-     * Example:                                                               *
-     *   + mbed:                                                              *
-     *     DigitalOut standby_reset;                                          *
-     *------------------------------------------------------------------------*/
-    /* Standby/reset pin. */
     GPIO_TypeDef* standby_reset_port;
     uint16_t standby_reset_pin;
 
-    /* ACTION 11 -------------------------------------------------------------*
-     * Declare here communication related variables, if needed.               *
-     *                                                                        *
-     * Example:                                                               *
-     *   + mbed:                                                              *
-     *     DigitalOut ssel;                                                   *
-     *     DevSPI &dev_spi;                                                   *
-     *------------------------------------------------------------------------*/
-    /* Configuration. */
     GPIO_TypeDef* ssel_port;
     uint16_t ssel_pin;
 
-    /* IO Device. */
     SPI_HandleTypeDef *spi;
 
-    /* ACTION 12 -------------------------------------------------------------*
-     * Declare here identity related variables, if needed.                    *
-     * Note that there should be only a unique identifier for each component, *
-     * which should be the "who_am_i" parameter.                              *
-     *------------------------------------------------------------------------*/
-    /* Identity */
-    uint8_t who_am_i;
 
-    /* ACTION 13 -------------------------------------------------------------*
-     * Declare here the component's static and non-static data, one variable  *
-     * per line.                                                              *
-     *                                                                        *
-     * Example:                                                               *
-     *   float measure;                                                       *
-     *   int instance_id;                                                     *
-     *   static int number_of_instances;                                      *
-     *------------------------------------------------------------------------*/
-    /* Data. */
     uint8_t L6470_Id;
     const sL6470_Register_t *L6470_Register;
     const sL6470_ApplicationCommand_t *L6470_ApplicationCommand;
@@ -1503,6 +1539,6 @@ protected:
     static uint8_t L6470_DaisyChainSpiRxStruct[L6470MAXSPICMDBYTESIZE][L6470DAISYCHAINSIZE];
 };
 
-#endif /* __L6470_CLASS_H */
+#include "L6470.tpp"
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+#endif /* __L6470_CLASS_H */

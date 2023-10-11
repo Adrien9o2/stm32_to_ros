@@ -1,73 +1,29 @@
-/**
- ******************************************************************************
- * @file       l6470_class.cpp
- * @date       01/10/2014 12:00:00
- * @brief      This file provides set of firmware functions to manage the
- *             L6470.
- ******************************************************************************
- *
- * COPYRIGHT(c) 2014 STMicroelectronics
- *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
- *   1. Redistributions of source code must retain the above copyright notice,
- *      this list of conditions and the following disclaimer.
- *   2. Redistributions in binary form must reproduce the above copyright notice,
- *      this list of conditions and the following disclaimer in the documentation
- *      and/or other materials provided with the distribution.
- *   3. Neither the name of STMicroelectronics nor the names of its contributors
- *      may be used to endorse or promote products derived from this software
- *      without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- ******************************************************************************
- */
-
-
-/* Generated with STM32CubeTOO -----------------------------------------------*/
-
-
-/* Revision ------------------------------------------------------------------*/
-/*
-    Repository:       http://svn.x-nucleodev.codex.cro.st.com/svnroot/X-NucleoDev
-    Branch/Trunk/Tag: trunk
-    Based on:         X-CUBE-SPN2/trunk/Drivers/BSP/Components/L6470/L6470.c
-    Revision:         0
-*/
-
 
 /* Includes ------------------------------------------------------------------*/
 
 #include "L6470.h"
 
 
-/* Variables -----------------------------------------------------------------*/
-
-/* Number of instantiated devices on an expansion board. */
-uint8_t L6470::number_of_devices = 0;
+template <class shield_x>
+uint8_t L6470<shield_x>::number_of_devices = 0;
 
 /* SPI Transmission for Daisy-Chain Configuration. */
-eFlagStatus_t L6470::L6470_DaisyChain_HalfPrepared;
-sL6470_AppCmdPkg_t L6470::L6470_AppCmdPkg[L6470DAISYCHAINSIZE];
-uint8_t L6470::L6470_DaisyChainSpiTxStruct[L6470MAXSPICMDBYTESIZE][L6470DAISYCHAINSIZE];
-uint8_t L6470::L6470_DaisyChainSpiRxStruct[L6470MAXSPICMDBYTESIZE][L6470DAISYCHAINSIZE];
+template <class shield_x>
+eFlagStatus_t L6470<shield_x>::L6470_DaisyChain_HalfPrepared;
+template <class shield_x>
+sL6470_AppCmdPkg_t L6470<shield_x>::L6470_AppCmdPkg[L6470DAISYCHAINSIZE];
+template <class shield_x>
+uint8_t L6470<shield_x>::L6470_DaisyChainSpiTxStruct[L6470MAXSPICMDBYTESIZE][L6470DAISYCHAINSIZE];
+template <class shield_x>
+uint8_t L6470<shield_x>::L6470_DaisyChainSpiRxStruct[L6470MAXSPICMDBYTESIZE][L6470DAISYCHAINSIZE];
 
 /**
   * @brief Array whose elements are a structure in which store information about
   *        the L6470 Registers (the address, the names, the length in bits, the
   *        reset value)
   */
-const sL6470_Register_t L6470::_L6470_Register[L6470REGIDSIZE] = {
+template <class shield_x>
+const sL6470_Register_t L6470<shield_x>::_L6470_Register[L6470REGIDSIZE] = {
   {0x01 , "ABS_POS",   22, 3, 0x000000},  //!< Current position
   {0x02 , "EL_POS",     9, 2, 0x0000},    //!< Electrical position
   {0x03 , "MARK",      22, 3, 0x000000},  //!< Mark position
@@ -100,7 +56,8 @@ const sL6470_Register_t L6470::_L6470_Register[L6470REGIDSIZE] = {
   *        the L6470 Application Commands (the mnemonic name, the number of
   *        needed parameters, the related funtion to call)
   */
-const sL6470_ApplicationCommand_t L6470::_L6470_ApplicationCommand[L6470APPCMDIDSIZE] =  {
+template <class shield_x>
+const sL6470_ApplicationCommand_t L6470<shield_x>::_L6470_ApplicationCommand[L6470APPCMDIDSIZE] =  {
   {"NOP",         0x00, 0},
   {"SETPARAM",    0x00, 2},
   {"GETPARAM",    0x20, 1},
@@ -125,7 +82,8 @@ const sL6470_ApplicationCommand_t L6470::_L6470_ApplicationCommand[L6470APPCMDID
 /**
   * @brief The mnemonic names for the L6470 direction
   */
-const sL6470_Direction_t L6470::_L6470_Direction[L6470DIRIDSIZE] = {
+template <class shield_x>
+const sL6470_Direction_t L6470<shield_x>::_L6470_Direction[L6470DIRIDSIZE] = {
   {"REV", 0x00},  //!< Reverse direction
   {"FWD", 0x01}   //!< Forward direction
 };
@@ -133,7 +91,8 @@ const sL6470_Direction_t L6470::_L6470_Direction[L6470DIRIDSIZE] = {
 /**
   * @brief Action taken about ABS_POS register
   */
-const sL6470_ACT_t L6470::_L6470_ACT[L6470ACTIDSIZE] = {
+template <class shield_x>
+const sL6470_ACT_t L6470<shield_x>::_L6470_ACT[L6470ACTIDSIZE] = {
   {"RST", 0x00},  //!< ABS_POS register is reset
   {"CPY", 0x01}   //!< ABS_POS register value is copied into the MARK register
 };
@@ -162,7 +121,8 @@ const sL6470_ACT_t L6470::_L6470_ACT[L6470ACTIDSIZE] = {
   *         application command and its the needed parameters.
   * @param  pL6470_AppCmdPkg   The structure to be reset.
   */
-void L6470::L6470_ResetAppCmdPkg(sL6470_AppCmdPkg_t* pL6470_AppCmdPkg)
+template <class shield_x>
+void L6470<shield_x>::L6470_ResetAppCmdPkg(sL6470_AppCmdPkg_t* pL6470_AppCmdPkg)
 {
   uint8_t id;
   
@@ -185,7 +145,8 @@ void L6470::L6470_ResetAppCmdPkg(sL6470_AppCmdPkg_t* pL6470_AppCmdPkg)
   * @param  p2                The 2nd parameter (if it is not needed it will be not considered).
   * @param  p3                The 3rd parameter (if it is not needed it will be not considered).
   */
-void L6470::L6470_FillAppCmdPkg(sL6470_AppCmdPkg_t* pL6470_AppCmdPkg, eL6470_AppCmdId_t L6470_AppCmdId, uint32_t p1, uint32_t p2, uint32_t p3)
+template <class shield_x>
+void L6470<shield_x>::L6470_FillAppCmdPkg(sL6470_AppCmdPkg_t* pL6470_AppCmdPkg, eL6470_AppCmdId_t L6470_AppCmdId, uint32_t p1, uint32_t p2, uint32_t p3)
 {
   (pL6470_AppCmdPkg+L6470_Id)->L6470_AppCmdId = L6470_AppCmdId;
   (pL6470_AppCmdPkg+L6470_Id)->p1 = p1;
@@ -204,7 +165,8 @@ void L6470::L6470_FillAppCmdPkg(sL6470_AppCmdPkg_t* pL6470_AppCmdPkg, eL6470_App
   * @param  p2                The 2nd parameter (if it is not needed it will be not considered).
   * @param  p3                The 3rd parameter (if it is not needed it will be not considered).
   */
-void L6470::L6470_PrepareAppCmdPkg(sL6470_AppCmdPkg_t* pL6470_AppCmdPkg, eL6470_AppCmdId_t L6470_AppCmdId, uint32_t p1, uint32_t p2, uint32_t p3)
+template <class shield_x>
+void L6470<shield_x>::L6470_PrepareAppCmdPkg(sL6470_AppCmdPkg_t* pL6470_AppCmdPkg, eL6470_AppCmdId_t L6470_AppCmdId, uint32_t p1, uint32_t p2, uint32_t p3)
 {
   if(!L6470_DaisyChain_HalfPrepared)
   {
@@ -222,7 +184,8 @@ void L6470::L6470_PrepareAppCmdPkg(sL6470_AppCmdPkg_t* pL6470_AppCmdPkg, eL6470_
   * @param  pL6470_AppCmdPkg              Pointer to the sL6470_AppCmdPkg_t to be filled.
   * @param  pL6470_DaisyChainSpiTxStruct  Pointer to the structure used by SPI to send the commands.
   */
-void L6470::L6470_PrepareDaisyChainCommand(sL6470_AppCmdPkg_t* pL6470_AppCmdPkg, uint8_t* pL6470_DaisyChainSpiTxStruct)
+template <class shield_x>
+void L6470<shield_x>::L6470_PrepareDaisyChainCommand(sL6470_AppCmdPkg_t* pL6470_AppCmdPkg, uint8_t* pL6470_DaisyChainSpiTxStruct)
 {
   uint8_t PkgId;
   uint8_t PARAMLengthBytes; /* The number of bytes related to the numeric value for the addressed register */
@@ -362,7 +325,8 @@ void L6470::L6470_PrepareDaisyChainCommand(sL6470_AppCmdPkg_t* pL6470_AppCmdPkg,
   * @param  AbsPos      The absolute position in the range from [-(2^21)] to [+(2^21)-1].
   * @retval Position    The position as signed number.
   */
-int32_t L6470::L6470_AbsPos_2_Position(uint32_t AbsPos)
+template <class shield_x>
+int32_t L6470<shield_x>::L6470_AbsPos_2_Position(uint32_t AbsPos)
 {
   if (AbsPos > L6470_MAX_POSITION)
     return (AbsPos - (L6470_POSITION_RANGE + 1));
@@ -376,7 +340,8 @@ int32_t L6470::L6470_AbsPos_2_Position(uint32_t AbsPos)
   * @param  Position    The position as signed number.
   * @retval AbsPos      The absolute position in the range from [-(2^21)] to [+(2^21)-1].
   */
-uint32_t L6470::L6470_Position_2_AbsPos(int32_t Position)
+template <class shield_x>
+uint32_t L6470<shield_x>::L6470_Position_2_AbsPos(int32_t Position)
 {
   if ((Position >= 0) && (Position <= L6470_MAX_POSITION))
     return Position;
@@ -395,7 +360,8 @@ uint32_t L6470::L6470_Position_2_AbsPos(int32_t Position)
   * @param  Speed       The SPEED register value.
   * @retval step/s      The speed as step/s.
   */
-float L6470::L6470_Speed_2_Step_s(uint32_t Speed)
+template <class shield_x>
+float L6470<shield_x>::L6470_Speed_2_Step_s(uint32_t Speed)
 {
   return (Speed * ((float)14.9012e-3));
 }
@@ -406,7 +372,8 @@ float L6470::L6470_Speed_2_Step_s(uint32_t Speed)
   * @param  step/s      The speed as step/s.
   * @retval Speed       The SPEED register value.
   */
-uint32_t L6470::L6470_Step_s_2_Speed(float Step_s)
+template <class shield_x>
+uint32_t L6470<shield_x>::L6470_Step_s_2_Speed(float Step_s)
 {
   if (Step_s <= (L6470_MAX_SPEED * ((float)14.9012e-3)))
     return (uint32_t)(Step_s / ((float)14.9012e-3));
@@ -420,7 +387,8 @@ uint32_t L6470::L6470_Step_s_2_Speed(float Step_s)
   * @param  Acc         The ACCEL register value.
   * @retval step/(s^2)  The acceleration as step/(s^2).
   */
-float L6470::L6470_Acc_2_Step_s2(uint16_t Acc)
+template <class shield_x>
+float L6470<shield_x>::L6470_Acc_2_Step_s2(uint16_t Acc)
 {
   if (Acc <= L6470_MAX_ACC)
     return (Acc * ((float)1.4552e1));
@@ -434,7 +402,8 @@ float L6470::L6470_Acc_2_Step_s2(uint16_t Acc)
   * @param  step/(s^2)  The acceleration as step/(s^2).
   * @retval Acc         The ACCEL register value.
   */
-uint16_t L6470::L6470_Step_s2_2_Acc(float Step_s2)
+template <class shield_x>
+uint16_t L6470<shield_x>::L6470_Step_s2_2_Acc(float Step_s2)
 {
   if (Step_s2 <= (L6470_MAX_ACC * ((float)1.4552e1)))
     return (uint16_t)(Step_s2 / ((float)1.4552e1));
@@ -448,7 +417,8 @@ uint16_t L6470::L6470_Step_s2_2_Acc(float Step_s2)
   * @param  Dec         The DECEL register value.
   * @retval step/(s^2)  The deceleration as step/(s^2).
   */
-float L6470::L6470_Dec_2_Step_s2(uint16_t Dec)
+template <class shield_x>
+float L6470<shield_x>::L6470_Dec_2_Step_s2(uint16_t Dec)
 {
   if (Dec <= L6470_MAX_DEC)
     return (Dec * ((float)1.4552e1));
@@ -462,7 +432,8 @@ float L6470::L6470_Dec_2_Step_s2(uint16_t Dec)
   * @param  step/(s^2)  The deceleration as step/(s^2).
   * @retval Dec         The DECEL register value.
   */
-uint16_t L6470::L6470_Step_s2_2_Dec(float Step_s2)
+template <class shield_x>
+uint16_t L6470<shield_x>::L6470_Step_s2_2_Dec(float Step_s2)
 {
   if (Step_s2 <= (L6470_MAX_DEC * ((float)1.4552e1)))
     return (uint16_t)(Step_s2 / ((float)1.4552e1));
@@ -476,7 +447,8 @@ uint16_t L6470::L6470_Step_s2_2_Dec(float Step_s2)
   * @param  MaxSpeed    The MAX_SPEED register value.
   * @retval step/s      The max speed as step/s.
   */
-float L6470::L6470_MaxSpeed_2_Step_s(uint16_t MaxSpeed)
+template <class shield_x>
+float L6470<shield_x>::L6470_MaxSpeed_2_Step_s(uint16_t MaxSpeed)
 {
   if (MaxSpeed <= L6470_MAX_MAX_SPEED)
     return (MaxSpeed * ((float)15.2588));
@@ -490,7 +462,8 @@ float L6470::L6470_MaxSpeed_2_Step_s(uint16_t MaxSpeed)
   * @param  step/s      The max speed as step/s.
   * @retval MaxSpeed    The MAX_SPEED register value.
   */
-uint16_t L6470::L6470_Step_s_2_MaxSpeed(float Step_s)
+template <class shield_x>
+uint16_t L6470<shield_x>::L6470_Step_s_2_MaxSpeed(float Step_s)
 {
   if (Step_s <= (L6470_MAX_MAX_SPEED * ((float)15.2588)))
     return (uint16_t)(Step_s / ((float)15.2588));
@@ -504,7 +477,8 @@ uint16_t L6470::L6470_Step_s_2_MaxSpeed(float Step_s)
   * @param  MinSpeed    The MIN_SPEED register value.
   * @retval step/s      The min speed as step/s.
   */
-float L6470::L6470_MinSpeed_2_Step_s(uint16_t MinSpeed)
+template <class shield_x>
+float L6470<shield_x>::L6470_MinSpeed_2_Step_s(uint16_t MinSpeed)
 {
   if (MinSpeed <= L6470_MAX_MIN_SPEED)
     return (MinSpeed * ((float)238.4186e-3));
@@ -518,7 +492,8 @@ float L6470::L6470_MinSpeed_2_Step_s(uint16_t MinSpeed)
   * @param  step/s      The min speed as step/s.
   * @retval MinSpeed    The MIN_SPEED register value.
   */
-uint16_t L6470::L6470_Step_s_2_MinSpeed(float Step_s)
+template <class shield_x>
+uint16_t L6470<shield_x>::L6470_Step_s_2_MinSpeed(float Step_s)
 {
   if (Step_s <= (L6470_MAX_MIN_SPEED * ((float)238.4186e-3)))
     return (uint16_t)(Step_s / ((float)238.4186e-3));
@@ -532,7 +507,8 @@ uint16_t L6470::L6470_Step_s_2_MinSpeed(float Step_s)
   * @param  FsSpd       The FS_SPD register value.
   * @retval step/s      The full-step speed as step/s.
   */
-float L6470::L6470_FsSpd_2_Step_s(uint16_t FsSpd)
+template <class shield_x>
+float L6470<shield_x>::L6470_FsSpd_2_Step_s(uint16_t FsSpd)
 {
   if (FsSpd <= L6470_MAX_FS_SPD)
     return ((FsSpd+0.5) * ((float)15.25));
@@ -546,7 +522,8 @@ float L6470::L6470_FsSpd_2_Step_s(uint16_t FsSpd)
   * @param  step/s      The full-step speed as step/s.
   * @retval FsSpd       The FS_SPD register value.
   */
-uint16_t L6470::L6470_Step_s_2_FsSpd(float Step_s)
+template <class shield_x>
+uint16_t L6470<shield_x>::L6470_Step_s_2_FsSpd(float Step_s)
 {
   if (Step_s <= ((L6470_MAX_FS_SPD+0.5) * ((float)15.25)))
     return (uint16_t)((float)(Step_s / ((float)15.25)) - (float)0.5);
@@ -560,7 +537,8 @@ uint16_t L6470::L6470_Step_s_2_FsSpd(float Step_s)
   * @param  IntSpeed    The INT_SPEED register value.
   * @retval step/s      The intersect speed as step/s.
   */
-float L6470::L6470_IntSpeed_2_Step_s(uint16_t IntSpeed)
+template <class shield_x>
+float L6470<shield_x>::L6470_IntSpeed_2_Step_s(uint16_t IntSpeed)
 {
   if (IntSpeed <= L6470_MAX_INT_SPEED)
     return (IntSpeed * ((float)59.6046e-3));
@@ -574,7 +552,8 @@ float L6470::L6470_IntSpeed_2_Step_s(uint16_t IntSpeed)
   * @param  step/s      The full-step speed as step/s.
   * @retval FsSpd       The FS_SPD register value.
   */
-uint16_t L6470::L6470_Step_s_2_IntSpeed(float Step_s)
+template <class shield_x>
+uint16_t L6470<shield_x>::L6470_Step_s_2_IntSpeed(float Step_s)
 {
   if (Step_s <= (L6470_MAX_INT_SPEED * ((float)59.6046e-3)))
     return (uint16_t)(Step_s / ((float)59.6046e-3));
@@ -588,7 +567,8 @@ uint16_t L6470::L6470_Step_s_2_IntSpeed(float Step_s)
   * @param  StartSlope  The ST_SLP register value.
   * @retval s/step      The start slope as s/step.
   */
-float L6470::L6470_StSlp_2_s_Step(uint8_t StSlp)
+template <class shield_x>
+float L6470<shield_x>::L6470_StSlp_2_s_Step(uint8_t StSlp)
 {
 //  if (StSlp <= L6470_MAX_ST_SLP)
     return (StSlp * ((float)1.5686e-5));
@@ -602,7 +582,8 @@ float L6470::L6470_StSlp_2_s_Step(uint8_t StSlp)
   * @param  step/s      The full-step speed as step/s.
   * @retval FsSpd       The FS_SPD register value.
   */
-uint8_t L6470::L6470_s_Step_2_StSlp(float s_Step)
+template <class shield_x>
+uint8_t L6470<shield_x>::L6470_s_Step_2_StSlp(float s_Step)
 {
   if (s_Step <= (L6470_MAX_ST_SLP * ((float)1.5686e-5)))
     return (uint8_t)(s_Step / ((float)1.5686e-5));
@@ -616,7 +597,8 @@ uint8_t L6470::L6470_s_Step_2_StSlp(float s_Step)
   * @param  IntSpeed    The INT_SPEED register value.
   * @retval step/s      The intersect speed as step/s.
   */
-float L6470::L6470_FnSlpAcc_2_s_Step(uint8_t FnSlpAcc)
+template <class shield_x>
+float L6470<shield_x>::L6470_FnSlpAcc_2_s_Step(uint8_t FnSlpAcc)
 {
 //  if (FnSlpAcc <= L6470_MAX_FN_SLP_ACC)
     return (FnSlpAcc * ((float)1.5686e-5));
@@ -630,7 +612,8 @@ float L6470::L6470_FnSlpAcc_2_s_Step(uint8_t FnSlpAcc)
   * @param  step/s      The full-step speed as step/s.
   * @retval FsSpd       The FS_SPD register value.
   */
-uint8_t L6470::L6470_s_Step_2_FnSlpAcc(float s_Step)
+template <class shield_x>
+uint8_t L6470<shield_x>::L6470_s_Step_2_FnSlpAcc(float s_Step)
 {
   if (s_Step <= (L6470_MAX_FN_SLP_ACC * ((float)1.5686e-5)))
     return (uint8_t)(s_Step / ((float)1.5686e-5));
@@ -644,7 +627,8 @@ uint8_t L6470::L6470_s_Step_2_FnSlpAcc(float s_Step)
   * @param  IntSpeed    The INT_SPEED register value.
   * @retval step/s      The intersect speed as step/s.
   */
-float L6470::L6470_FnSlpDec_2_s_Step(uint8_t FnSlpDec)
+template <class shield_x>
+float L6470<shield_x>::L6470_FnSlpDec_2_s_Step(uint8_t FnSlpDec)
 {
 //  if (FnSlpDec <= L6470_MAX_FN_SLP_DEC)
     return (FnSlpDec * ((float)1.5686e-5));
@@ -658,7 +642,8 @@ float L6470::L6470_FnSlpDec_2_s_Step(uint8_t FnSlpDec)
   * @param  step/s      The full-step speed as step/s.
   * @retval FsSpd       The FS_SPD register value.
   */
-uint8_t L6470::L6470_s_Step_2_FnSlpDec(float s_Step)
+template <class shield_x>
+uint8_t L6470<shield_x>::L6470_s_Step_2_FnSlpDec(float s_Step)
 {
   if (s_Step <= (L6470_MAX_FN_SLP_DEC * ((float)1.5686e-5)))
     return (uint8_t)(s_Step / ((float)1.5686e-5));
@@ -672,7 +657,8 @@ uint8_t L6470::L6470_s_Step_2_FnSlpDec(float s_Step)
   * @param  OcdTh       The OCD_TH register value.
   * @retval mA          The overcurrent threshold as mA.
   */
-float L6470::L6470_OcdTh_2_mA(uint8_t OcdTh)
+template <class shield_x>
+float L6470<shield_x>::L6470_OcdTh_2_mA(uint8_t OcdTh)
 {
   if (OcdTh <= L6470_MAX_OCD_TH)
     return ((OcdTh+1) * ((float)375));
@@ -686,7 +672,8 @@ float L6470::L6470_OcdTh_2_mA(uint8_t OcdTh)
   * @param  mA          The overcurrent threshold as mA.
   * @retval OcdTh       The OCD_TH register value.
   */
-uint8_t L6470::L6470_mA_2_OcdTh(float mA)
+template <class shield_x>
+uint8_t L6470<shield_x>::L6470_mA_2_OcdTh(float mA)
 {
   float result, decimal;
   
@@ -710,7 +697,8 @@ uint8_t L6470::L6470_mA_2_OcdTh(float mA)
   * @param  StallTh     The STALL_TH register value.
   * @retval mA          The stall detection threshold as mA.
   */
-float L6470::L6470_StallTh_2_mA(uint8_t StallTh)
+template <class shield_x>
+float L6470<shield_x>::L6470_StallTh_2_mA(uint8_t StallTh)
 {
   if (StallTh <= L6470_MAX_STALL_TH)
     return ((StallTh+1) * ((float)31.25));
@@ -724,7 +712,8 @@ float L6470::L6470_StallTh_2_mA(uint8_t StallTh)
   * @param  mA          The stall detection threshold as mA.
   * @retval StallTh     The STALL_TH register value.
   */
-uint8_t L6470::L6470_mA_2_StallTh(float mA)
+template <class shield_x>
+uint8_t L6470<shield_x>::L6470_mA_2_StallTh(float mA)
 {
   float result, decimal;
   
@@ -755,7 +744,8 @@ uint8_t L6470::L6470_mA_2_StallTh(float mA)
   * @param  L6470_RegId   The identifier of the L6470 register to be addressed.
   * @param  Value         The new value.
   */
-void L6470::L6470_SetParam(eL6470_RegId_t L6470_RegId, uint32_t Value)
+template <class shield_x>
+void L6470<shield_x>::L6470_SetParam(eL6470_RegId_t L6470_RegId, uint32_t Value)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_SETPARAM_ID, L6470_RegId, Value, 0);
   L6470_PrepareDaisyChainCommand(L6470_AppCmdPkg, (uint8_t*)L6470_DaisyChainSpiTxStruct);
@@ -769,7 +759,8 @@ void L6470::L6470_SetParam(eL6470_RegId_t L6470_RegId, uint32_t Value)
   * 
   * @retval ReceivedValue The register value.
   */
-uint32_t L6470::L6470_GetParam(eL6470_RegId_t L6470_RegId)
+template <class shield_x>
+uint32_t L6470<shield_x>::L6470_GetParam(eL6470_RegId_t L6470_RegId)
 {
   uint8_t ValueLengthByte;
   uint32_t ReceivedValue;
@@ -791,7 +782,8 @@ uint32_t L6470::L6470_GetParam(eL6470_RegId_t L6470_RegId)
   * @param  L6470_DirId   The identifier of the L6470 motion direction.
   * @param  Speed         The speed value as (([step/s] * 250e-9) / 2^-28)
   */
-void L6470::L6470_Run(eL6470_DirId_t L6470_DirId, uint32_t Speed)
+template <class shield_x>
+void L6470<shield_x>::L6470_Run(eL6470_DirId_t L6470_DirId, uint32_t Speed)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_RUN_ID, L6470_DirId, Speed, 0);
   L6470_PrepareDaisyChainCommand(L6470_AppCmdPkg, (uint8_t*)L6470_DaisyChainSpiTxStruct);
@@ -803,7 +795,8 @@ void L6470::L6470_Run(eL6470_DirId_t L6470_DirId, uint32_t Speed)
   * 
   * @param  L6470_DirId   The identifier of the L6470 motion direction.
   */
-void L6470::L6470_StepClock(eL6470_DirId_t L6470_DirId)
+template <class shield_x>
+void L6470<shield_x>::L6470_StepClock(eL6470_DirId_t L6470_DirId)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_STEPCLOCK_ID, L6470_DirId, 0, 0);
   L6470_PrepareDaisyChainCommand(L6470_AppCmdPkg, (uint8_t*)L6470_DaisyChainSpiTxStruct);
@@ -816,7 +809,8 @@ void L6470::L6470_StepClock(eL6470_DirId_t L6470_DirId)
   * @param  L6470_DirId   The identifier of the L6470 motion direction.
   * @param  N_Step        The number of microsteps.
   */
-void L6470::L6470_Move(eL6470_DirId_t L6470_DirId, uint32_t N_Step)
+template <class shield_x>
+void L6470<shield_x>::L6470_Move(eL6470_DirId_t L6470_DirId, uint32_t N_Step)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_MOVE_ID, L6470_DirId, N_Step, 0);
   L6470_PrepareDaisyChainCommand(L6470_AppCmdPkg, (uint8_t*)L6470_DaisyChainSpiTxStruct);
@@ -828,7 +822,8 @@ void L6470::L6470_Move(eL6470_DirId_t L6470_DirId, uint32_t N_Step)
   * 
   * @param  AbsPos        The target absolute position.
   */
-void L6470::L6470_GoTo(uint32_t AbsPos)
+template <class shield_x>
+void L6470<shield_x>::L6470_GoTo(uint32_t AbsPos)
 {
   if (AbsPos <= L6470_POSITION_RANGE)
   {
@@ -844,7 +839,8 @@ void L6470::L6470_GoTo(uint32_t AbsPos)
   * @param  L6470_DirId   The identifier of the L6470 motion direction.
   * @param  AbsPos        The target absolute position.
   */
-void L6470::L6470_GoToDir(eL6470_DirId_t L6470_DirId, uint32_t AbsPos)
+template <class shield_x>
+void L6470<shield_x>::L6470_GoToDir(eL6470_DirId_t L6470_DirId, uint32_t AbsPos)
 {
   if (AbsPos <= L6470_POSITION_RANGE)
   {
@@ -862,7 +858,8 @@ void L6470::L6470_GoToDir(eL6470_DirId_t L6470_DirId, uint32_t AbsPos)
   * @param  L6470_DirId   The identifier of the L6470 motion direction.
   * @param  Speed         The speed value as (([step/s] * 250e-9) / 2^-28)
   */
-void L6470::L6470_GoUntil(eL6470_ActId_t L6470_ActId, eL6470_DirId_t L6470_DirId, uint32_t Speed)
+template <class shield_x>
+void L6470<shield_x>::L6470_GoUntil(eL6470_ActId_t L6470_ActId, eL6470_DirId_t L6470_DirId, uint32_t Speed)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_GOUNTIL_ID, L6470_ActId, L6470_DirId, Speed);
   L6470_PrepareDaisyChainCommand(L6470_AppCmdPkg, (uint8_t*)L6470_DaisyChainSpiTxStruct);
@@ -876,7 +873,8 @@ void L6470::L6470_GoUntil(eL6470_ActId_t L6470_ActId, eL6470_DirId_t L6470_DirId
   * @param  L6470_ActId   The identifier of the L6470 action about the absolute position.
   * @param  L6470_DirId   The identifier of the L6470 motion direction.
   */
-void L6470::L6470_ReleaseSW(eL6470_ActId_t L6470_ActId, eL6470_DirId_t L6470_DirId)
+template <class shield_x>
+void L6470<shield_x>::L6470_ReleaseSW(eL6470_ActId_t L6470_ActId, eL6470_DirId_t L6470_DirId)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_RELEASESW_ID, L6470_ActId, L6470_DirId, 0);
   L6470_PrepareDaisyChainCommand(L6470_AppCmdPkg, (uint8_t*)L6470_DaisyChainSpiTxStruct);
@@ -888,7 +886,8 @@ void L6470::L6470_ReleaseSW(eL6470_ActId_t L6470_ActId, eL6470_DirId_t L6470_Dir
   *         via the shortest path.
   * 
   */
-void L6470::L6470_GoHome(void)
+template <class shield_x>
+void L6470<shield_x>::L6470_GoHome(void)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_GOHOME_ID, 0, 0, 0);
   L6470_PrepareDaisyChainCommand(L6470_AppCmdPkg, (uint8_t*)L6470_DaisyChainSpiTxStruct);
@@ -900,7 +899,8 @@ void L6470::L6470_GoHome(void)
   *         minimum path.
   * 
   */
-void L6470::L6470_GoMark(void)
+template <class shield_x>
+void L6470<shield_x>::L6470_GoMark(void)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_GOMARK_ID, 0, 0, 0);
   L6470_PrepareDaisyChainCommand(L6470_AppCmdPkg, (uint8_t*)L6470_DaisyChainSpiTxStruct);
@@ -911,7 +911,8 @@ void L6470::L6470_GoMark(void)
   * @brief  ResetPos command resets the ABS_POS register to zero.
   * 
   */
-void L6470::L6470_ResetPos(void)
+template <class shield_x>
+void L6470<shield_x>::L6470_ResetPos(void)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_RESETPOS_ID, 0, 0, 0);
   L6470_PrepareDaisyChainCommand(L6470_AppCmdPkg, (uint8_t*)L6470_DaisyChainSpiTxStruct);
@@ -922,7 +923,8 @@ void L6470::L6470_ResetPos(void)
   * @brief  ResetDevice command resets the device to power-up conditions.
   * 
   */
-void L6470::L6470_ResetDevice(void)
+template <class shield_x>
+void L6470<shield_x>::L6470_ResetDevice(void)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_RESETDEVICE_ID, 0, 0, 0);
   L6470_PrepareDaisyChainCommand(L6470_AppCmdPkg, (uint8_t*)L6470_DaisyChainSpiTxStruct);
@@ -935,7 +937,8 @@ void L6470::L6470_ResetDevice(void)
   *         in the DECEL register.
   * 
   */
-void L6470::L6470_SoftStop(void)
+template <class shield_x>
+void L6470<shield_x>::L6470_SoftStop(void)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_SOFTSTOP_ID, 0, 0, 0);
   L6470_PrepareDaisyChainCommand(L6470_AppCmdPkg, (uint8_t*)L6470_DaisyChainSpiTxStruct);
@@ -946,7 +949,8 @@ void L6470::L6470_SoftStop(void)
   * @brief  HardStop command causes an immediate motor stop with infinite deceleration.
   * 
   */
-void L6470::L6470_HardStop(void)
+template <class shield_x>
+void L6470<shield_x>::L6470_HardStop(void)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_HARDSTOP_ID, 0, 0, 0);
   L6470_PrepareDaisyChainCommand(L6470_AppCmdPkg, (uint8_t*)L6470_DaisyChainSpiTxStruct);
@@ -959,7 +963,8 @@ void L6470::L6470_HardStop(void)
   *         stored in the DECEL register.
   * 
   */
-void L6470::L6470_SoftHiZ(void)
+template <class shield_x>
+void L6470<shield_x>::L6470_SoftHiZ(void)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_SOFTHIZ_ID, 0, 0, 0);
   L6470_PrepareDaisyChainCommand(L6470_AppCmdPkg, (uint8_t*)L6470_DaisyChainSpiTxStruct);
@@ -970,7 +975,8 @@ void L6470::L6470_SoftHiZ(void)
   * @brief  HardHiZ command immediately disables the power bridges (high impedance state).
   * 
   */
-void L6470::L6470_HardHiZ(void)
+template <class shield_x>
+void L6470<shield_x>::L6470_HardHiZ(void)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_HARDHIZ_ID, 0, 0, 0);
   L6470_PrepareDaisyChainCommand(L6470_AppCmdPkg, (uint8_t*)L6470_DaisyChainSpiTxStruct);
@@ -983,7 +989,8 @@ void L6470::L6470_HardHiZ(void)
   * 
   * @retval ReceivedValue The register value.
   */
-uint16_t L6470::L6470_GetStatus(void)
+template <class shield_x>
+uint16_t L6470<shield_x>::L6470_GetStatus(void)
 {
   uint16_t ReceivedValue;
 
@@ -1012,7 +1019,8 @@ uint16_t L6470::L6470_GetStatus(void)
   * @note   This function will properly fill the right column of the L6470_AppCmdPkg.
   * @note   The commad will be sent by @ref L6470_PerformPreparedApplicationCommand.
   */
-void L6470::L6470_PrepareSetParam(eL6470_RegId_t L6470_RegId, uint32_t Value)
+template <class shield_x>
+void L6470<shield_x>::L6470_PrepareSetParam(eL6470_RegId_t L6470_RegId, uint32_t Value)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_SETPARAM_ID, L6470_RegId, Value, 0);
 }
@@ -1028,7 +1036,8 @@ void L6470::L6470_PrepareSetParam(eL6470_RegId_t L6470_RegId, uint32_t Value)
   * @note   This function will properly fill the right column of the L6470_AppCmdPkg.
   * @note   The commad will be sent by @ref L6470_PerformPreparedApplicationCommand.
   */
-void L6470::L6470_PrepareGetParam(eL6470_RegId_t L6470_RegId)
+template <class shield_x>
+void L6470<shield_x>::L6470_PrepareGetParam(eL6470_RegId_t L6470_RegId)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_GETPARAM_ID, L6470_RegId, 0, 0);
 }
@@ -1042,7 +1051,8 @@ void L6470::L6470_PrepareGetParam(eL6470_RegId_t L6470_RegId)
   * @note   This function will properly fill the right column of the L6470_AppCmdPkg.
   * @note   The commad will be sent by @ref L6470_PerformPreparedApplicationCommand.
   */
-void L6470::L6470_PrepareRun(eL6470_DirId_t L6470_DirId, uint32_t Speed)
+template <class shield_x>
+void L6470<shield_x>::L6470_PrepareRun(eL6470_DirId_t L6470_DirId, uint32_t Speed)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_RUN_ID, L6470_DirId, Speed, 0);
 }
@@ -1055,7 +1065,8 @@ void L6470::L6470_PrepareRun(eL6470_DirId_t L6470_DirId, uint32_t Speed)
   * @note   This function will properly fill the right column of the L6470_AppCmdPkg.
   * @note   The commad will be sent by @ref L6470_PerformPreparedApplicationCommand.
   */
-void L6470::L6470_PrepareStepClock(eL6470_DirId_t L6470_DirId)
+template <class shield_x>
+void L6470<shield_x>::L6470_PrepareStepClock(eL6470_DirId_t L6470_DirId)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_STEPCLOCK_ID, L6470_DirId, 0, 0);
 }
@@ -1069,7 +1080,8 @@ void L6470::L6470_PrepareStepClock(eL6470_DirId_t L6470_DirId)
   * @note   This function will properly fill the right column of the L6470_AppCmdPkg.
   * @note   The commad will be sent by @ref L6470_PerformPreparedApplicationCommand.
   */
-void L6470::L6470_PrepareMove(eL6470_DirId_t L6470_DirId, uint32_t N_Step)
+template <class shield_x>
+void L6470<shield_x>::L6470_PrepareMove(eL6470_DirId_t L6470_DirId, uint32_t N_Step)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_MOVE_ID, L6470_DirId, N_Step, 0);
 }
@@ -1082,7 +1094,8 @@ void L6470::L6470_PrepareMove(eL6470_DirId_t L6470_DirId, uint32_t N_Step)
   * @note   This function will properly fill the right column of the L6470_AppCmdPkg.
   * @note   The commad will be sent by @ref L6470_PerformPreparedApplicationCommand.
   */
-void L6470::L6470_PrepareGoTo(uint32_t AbsPos)
+template <class shield_x>
+void L6470<shield_x>::L6470_PrepareGoTo(uint32_t AbsPos)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_GOTO_ID, AbsPos, 0, 0);
 }
@@ -1096,7 +1109,8 @@ void L6470::L6470_PrepareGoTo(uint32_t AbsPos)
   * @note   This function will properly fill the right column of the L6470_AppCmdPkg.
   * @note   The commad will be sent by @ref L6470_PerformPreparedApplicationCommand.
   */
-void L6470::L6470_PrepareGoToDir(eL6470_DirId_t L6470_DirId, uint32_t AbsPos)
+template <class shield_x>
+void L6470<shield_x>::L6470_PrepareGoToDir(eL6470_DirId_t L6470_DirId, uint32_t AbsPos)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_GOTODIR_ID, L6470_DirId, AbsPos, 0);
 }
@@ -1111,7 +1125,8 @@ void L6470::L6470_PrepareGoToDir(eL6470_DirId_t L6470_DirId, uint32_t AbsPos)
   * @note   This function will properly fill the right column of the L6470_AppCmdPkg.
   * @note   The commad will be sent by @ref L6470_PerformPreparedApplicationCommand.
   */
-void L6470::L6470_PrepareGoUntil(eL6470_ActId_t L6470_ActId, eL6470_DirId_t L6470_DirId, uint32_t Speed)
+template <class shield_x>
+void L6470<shield_x>::L6470_PrepareGoUntil(eL6470_ActId_t L6470_ActId, eL6470_DirId_t L6470_DirId, uint32_t Speed)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_GOUNTIL_ID, L6470_ActId, L6470_DirId, Speed);
 }
@@ -1125,7 +1140,8 @@ void L6470::L6470_PrepareGoUntil(eL6470_ActId_t L6470_ActId, eL6470_DirId_t L647
   * @note   This function will properly fill the right column of the L6470_AppCmdPkg.
   * @note   The commad will be sent by @ref L6470_PerformPreparedApplicationCommand.
   */
-void L6470::L6470_PrepareReleaseSW(eL6470_ActId_t L6470_ActId, eL6470_DirId_t L6470_DirId)
+template <class shield_x>
+void L6470<shield_x>::L6470_PrepareReleaseSW(eL6470_ActId_t L6470_ActId, eL6470_DirId_t L6470_DirId)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_RELEASESW_ID, L6470_ActId, L6470_DirId, 0);
 }
@@ -1137,7 +1153,8 @@ void L6470::L6470_PrepareReleaseSW(eL6470_ActId_t L6470_ActId, eL6470_DirId_t L6
   * @note   This function will properly fill the right column of the L6470_AppCmdPkg.
   * @note   The commad will be sent by @ref L6470_PerformPreparedApplicationCommand.
   */
-void L6470::L6470_PrepareGoHome(void)
+template <class shield_x>
+void L6470<shield_x>::L6470_PrepareGoHome(void)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_GOHOME_ID, 0, 0, 0);
 }
@@ -1149,7 +1166,8 @@ void L6470::L6470_PrepareGoHome(void)
   * @note   This function will properly fill the right column of the L6470_AppCmdPkg.
   * @note   The commad will be sent by @ref L6470_PerformPreparedApplicationCommand.
   */
-void L6470::L6470_PrepareGoMark(void)
+template <class shield_x>
+void L6470<shield_x>::L6470_PrepareGoMark(void)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_GOMARK_ID, 0, 0, 0);
 }
@@ -1161,7 +1179,8 @@ void L6470::L6470_PrepareGoMark(void)
   * @note   This function will properly fill the right column of the L6470_AppCmdPkg.
   * @note   The commad will be sent by @ref L6470_PerformPreparedApplicationCommand.
   */
-void L6470::L6470_PrepareResetPos(void)
+template <class shield_x>
+void L6470<shield_x>::L6470_PrepareResetPos(void)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_RESETPOS_ID, 0, 0, 0);
 }
@@ -1173,7 +1192,8 @@ void L6470::L6470_PrepareResetPos(void)
   * @note   This function will properly fill the right column of the L6470_AppCmdPkg.
   * @note   The commad will be sent by @ref L6470_PerformPreparedApplicationCommand.
   */
-void L6470::L6470_PrepareResetDevice(void)
+template <class shield_x>
+void L6470<shield_x>::L6470_PrepareResetDevice(void)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_RESETDEVICE_ID, 0, 0, 0);
 }
@@ -1185,7 +1205,8 @@ void L6470::L6470_PrepareResetDevice(void)
   * @note   This function will properly fill the right column of the L6470_AppCmdPkg.
   * @note   The commad will be sent by @ref L6470_PerformPreparedApplicationCommand.
   */
-void L6470::L6470_PrepareSoftStop(void)
+template <class shield_x>
+void L6470<shield_x>::L6470_PrepareSoftStop(void)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_SOFTSTOP_ID, 0, 0, 0);
 }
@@ -1197,7 +1218,8 @@ void L6470::L6470_PrepareSoftStop(void)
   * @note   This function will properly fill the right column of the L6470_AppCmdPkg.
   * @note   The commad will be sent by @ref L6470_PerformPreparedApplicationCommand.
   */
-void L6470::L6470_PrepareHardStop(void)
+template <class shield_x>
+void L6470<shield_x>::L6470_PrepareHardStop(void)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_HARDSTOP_ID, 0, 0, 0);
 }
@@ -1209,7 +1231,8 @@ void L6470::L6470_PrepareHardStop(void)
   * @note   This function will properly fill the right column of the L6470_AppCmdPkg.
   * @note   The commad will be sent by @ref L6470_PerformPreparedApplicationCommand.
   */
-void L6470::L6470_PrepareSoftHiZ(void)
+template <class shield_x>
+void L6470<shield_x>::L6470_PrepareSoftHiZ(void)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_SOFTHIZ_ID, 0, 0, 0);
 }
@@ -1221,7 +1244,8 @@ void L6470::L6470_PrepareSoftHiZ(void)
   * @note   This function will properly fill the right column of the L6470_AppCmdPkg.
   * @note   The commad will be sent by @ref L6470_PerformPreparedApplicationCommand.
   */
-void L6470::L6470_PrepareHardHiZ(void)
+template <class shield_x>
+void L6470<shield_x>::L6470_PrepareHardHiZ(void)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_HARDHIZ_ID, 0, 0, 0);
 }
@@ -1233,7 +1257,8 @@ void L6470::L6470_PrepareHardHiZ(void)
   * @note   This function will properly fill the right column of the L6470_AppCmdPkg.
   * @note   The commad will be sent by @ref L6470_PerformPreparedApplicationCommand.
   */
-void L6470::L6470_PrepareGetStatus(void)
+template <class shield_x>
+void L6470<shield_x>::L6470_PrepareGetStatus(void)
 {
   L6470_PrepareAppCmdPkg(L6470_AppCmdPkg, L6470_GETSTATUS_ID, 0, 0, 0);
 }
@@ -1248,7 +1273,8 @@ void L6470::L6470_PrepareGetStatus(void)
   *         containing returned values from each L6470 of the daisy chain for each
   *         sent SPI data.
   */
-uint8_t* L6470::L6470_PerformPreparedApplicationCommand(void)
+template <class shield_x>
+uint8_t* L6470<shield_x>::L6470_PerformPreparedApplicationCommand(void)
 {
   L6470_PrepareDaisyChainCommand(L6470_AppCmdPkg, (uint8_t*)L6470_DaisyChainSpiTxStruct);
   L6470_DaisyChainCommand((uint8_t*)L6470_DaisyChainSpiTxStruct, (uint8_t*)L6470_DaisyChainSpiRxStruct);
@@ -1261,7 +1287,8 @@ uint8_t* L6470::L6470_PerformPreparedApplicationCommand(void)
   * @param  pL6470_DaisyChainSpiTxStruct  Pointer to the matrix array of bytes to be sent to the daisy chain L6470
   * @param  pL6470_DaisyChainSpiRxStruct  Pointer to the matrix array of bytes to be received from the daisy chain L6470
   */
-void L6470::L6470_DaisyChainCommand(uint8_t* pL6470_DaisyChainSpiTxStruct, uint8_t* pL6470_DaisyChainSpiRxStruct)
+template <class shield_x>
+void L6470<shield_x>::L6470_DaisyChainCommand(uint8_t* pL6470_DaisyChainSpiTxStruct, uint8_t* pL6470_DaisyChainSpiRxStruct)
 {
   uint8_t spibyte;
   
@@ -1275,8 +1302,9 @@ void L6470::L6470_DaisyChainCommand(uint8_t* pL6470_DaisyChainSpiTxStruct, uint8
     
     //_DELAY(TDISCS);
     uint8_t delay_cnt;
-    for (delay_cnt=0; delay_cnt<20; delay_cnt++) __NOP();   //!<Simply deselect time delay for SPI nCS
+    for (delay_cnt=0; delay_cnt<125; delay_cnt++) __NOP();   //!<Simply deselect time delay for SPI nCS
   }
+  __NOP();
 }
 
 /**
@@ -1287,7 +1315,8 @@ void L6470::L6470_DaisyChainCommand(uint8_t* pL6470_DaisyChainSpiTxStruct, uint8
   *           contains the received data by SPI from the L6470 daisy chain.
   * @param    LengthByte  The number of bytes about the received value.
   */
-uint32_t L6470::L6470_ExtractReturnedData(uint8_t* pL6470_DaisyChainSpiRxStruct, uint8_t LengthByte)
+template <class shield_x>
+uint32_t L6470<shield_x>::L6470_ExtractReturnedData(uint8_t* pL6470_DaisyChainSpiRxStruct, uint8_t LengthByte)
 {
   uint32_t value;
   uint8_t i;
@@ -1309,8 +1338,8 @@ uint32_t L6470::L6470_ExtractReturnedData(uint8_t* pL6470_DaisyChainSpiRxStruct,
   *
   * @retval state The flag state.
   */
-
-uint8_t L6470::L6470_CheckStatusRegisterFlag(uint8_t L6470_StatusRegisterFlagId)
+template <class shield_x>
+uint8_t L6470<shield_x>::L6470_CheckStatusRegisterFlag(uint8_t L6470_StatusRegisterFlagId)
 {
   uint8_t state = 0;
 
@@ -1372,7 +1401,8 @@ uint8_t L6470::L6470_CheckStatusRegisterFlag(uint8_t L6470_StatusRegisterFlagId)
   * @brief  Return the mnemonic name for the L6470 register.
   * @param  id  The identifier of the L6470 register.
   */
-uint8_t *L6470::L6470_GetRegisterName(uint8_t id)
+template <class shield_x>
+uint8_t *L6470<shield_x>::L6470_GetRegisterName(uint8_t id)
 {
   if (id < L6470REGIDSIZE)
   {
@@ -1388,7 +1418,8 @@ uint8_t *L6470::L6470_GetRegisterName(uint8_t id)
   * @brief  Configures the L6470 registers.
   * @param  init The pointer to the initialization structure.
   */
-status_t L6470::L6470_Config(void *init)
+template <class shield_x>
+status_t L6470<shield_x>::L6470_Config(void *init)
 {
   /* Reset devices. */
   reset_device();

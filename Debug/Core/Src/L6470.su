@@ -1,5 +1,5 @@
-../Core/Inc/L6470.h:1395:14:status_t L6470::ReadWrite(uint8_t*, uint8_t*, uint16_t)	32	static
-../Core/Inc/L6470.h:1423:10:void L6470::L6470_SPI_Communication(uint8_t*, uint8_t*, uint16_t, uint32_t)	24	static
+../Core/Inc/L6470.h:1395:14:status_t L6470::ReadWrite(uint8_t*, uint8_t*, uint16_t)	40	static
+../Core/Inc/L6470.h:1416:10:void L6470::L6470_SPI_Communication(uint8_t*, uint8_t*, uint16_t, uint32_t)	24	static
 ../Core/Src/L6470.cpp:165:6:void L6470::L6470_ResetAppCmdPkg(sL6470_AppCmdPkg_t*)	24	static
 ../Core/Src/L6470.cpp:188:6:void L6470::L6470_FillAppCmdPkg(sL6470_AppCmdPkg_t*, eL6470_AppCmdId_t, uint32_t, uint32_t, uint32_t)	24	static
 ../Core/Src/L6470.cpp:207:6:void L6470::L6470_PrepareAppCmdPkg(sL6470_AppCmdPkg_t*, eL6470_AppCmdId_t, uint32_t, uint32_t, uint32_t)	32	static
@@ -68,7 +68,7 @@
 ../Core/Src/L6470.cpp:1236:6:void L6470::L6470_PrepareGetStatus()	24	static
 ../Core/Src/L6470.cpp:1251:10:uint8_t* L6470::L6470_PerformPreparedApplicationCommand()	16	static
 ../Core/Src/L6470.cpp:1264:6:void L6470::L6470_DaisyChainCommand(uint8_t*, uint8_t*)	40	static,ignoring_inline_asm
-../Core/Src/L6470.cpp:1290:10:uint32_t L6470::L6470_ExtractReturnedData(uint8_t*, uint8_t)	32	static
-../Core/Src/L6470.cpp:1313:9:uint8_t L6470::L6470_CheckStatusRegisterFlag(uint8_t)	24	static
-../Core/Src/L6470.cpp:1375:10:uint8_t* L6470::L6470_GetRegisterName(uint8_t)	16	static
-../Core/Src/L6470.cpp:1391:10:status_t L6470::L6470_Config(void*)	32	static
+../Core/Src/L6470.cpp:1291:10:uint32_t L6470::L6470_ExtractReturnedData(uint8_t*, uint8_t)	32	static
+../Core/Src/L6470.cpp:1314:9:uint8_t L6470::L6470_CheckStatusRegisterFlag(uint8_t)	24	static
+../Core/Src/L6470.cpp:1376:10:uint8_t* L6470::L6470_GetRegisterName(uint8_t)	16	static
+../Core/Src/L6470.cpp:1392:10:status_t L6470::L6470_Config(void*)	32	static

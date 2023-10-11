@@ -26,6 +26,7 @@
 #include <stdio.h>
 # include "msg_handler.hpp"
 # include "XNucleoIHM02A1.h"
+#include "BlocMoteurs.hpp"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -42,7 +43,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+#define MS_500 25
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -61,123 +62,11 @@ MsgHandler msg_handler(&huart2);
 float to_send = 0.1;
 bool oneof2led = false;
 bool timer_20_ms = false;
+int timer_20_ms_count = 0;
+float input_motor_speeds[4] {0.0,0.0,0.0,0.0};
+bool timeout_moteurs = false;
 
-XNucleoIHM02A1* bottom_shield;
-L6470 **motors;
-
-L6470_init_t initShield[L6470DAISYCHAINSIZE] = { // init parameters for the motors
-/* First Motor.G */
-{
-	22.0,							   /* Motor supply voltage in V. */
-	200,						   /* Min number of steps per revolution for the motor. = 360/1.8° */
-	1.0,							   /* Max motor phase voltage in A. /!\ UNUSED - USELESS /!\ */
-	3.5,							   /* Max motor phase voltage in V. /!\ UNUSED - USELESS /!\ */
-	0,							   /* Motor initial speed [step/s]. Seems logic at 0*/
-	1500.0,						   /* Motor acceleration [step/s^2] (comment for infinite acceleration mode) */
-	1500.0,						   /* Motor deceleration [step/s^2] (comment for infinite deceleration mode)*/
-	3000,						   /* Motor maximum speed [step/s] */
-	0.0,						   /* Motor minimum speed [step/s]*/
-	1500,						   /* Motor full-step speed threshold [step/s]. Limit microstep -> fullstep */
-	5.3,							   /* Holding kval [V]. */
-	5.3,							   /* Constant speed kval [V]. */
-	5.3,							   /* Acceleration starting kval [V]. */
-	5.3,							   /* Deceleration starting kval [V]. */
-	269.9268,							   /* Intersect speed for bemf compensation curve slope changing [step/s]. */
-	0.00072448,						   /* Start slope [s/step]. */
-	0.0016,						   /* Acceleration final slope [s/step]. */
-	0.0016,						   /* Deceleration final slope [s/step]. */
-	0,							   /* Thermal compensation factor (range [0, 15]). */
-	3.5 * 1000 * 1.10,			   /* Ocd threshold [ma] (range [375 ma, 6000 ma]). Calculated with Kval*/
-	3.5 * 1000 * 1.00,			   /* Stall threshold [ma] (range [31.25 ma, 4000 ma]). Calculated Kval */
-	StepperMotor::STEP_MODE_HALF, /* Step mode selection. */
-	0xFF,						   /* Alarm conditions enable. */
-	0x2E88						   /* Ic configuration. */
-},
-
-/* Second Motor. */
-{
-	22.0,							   /* Motor supply voltage in V. */
-	200,						   /* Min number of steps per revolution for the motor. = 360/1.8° */
-	1.0,							   /* Max motor phase voltage in A. /!\ UNUSED - USELESS /!\ */
-	3.5,							   /* Max motor phase voltage in V. /!\ UNUSED - USELESS /!\ */
-	0,							   /* Motor initial speed [step/s]. */
-	1500.0,						   /* Motor acceleration [step/s^2] (comment for infinite acceleration mode). */
-	1500.0,						   /* Motor deceleration [step/s^2] (comment for infinite deceleration mode). */
-	3000,						   /* Motor maximum speed [step/s]. */
-	0.0,						   /* Motor minimum speed [step/s]. */
-	1500,						   /* Motor full-step speed threshold [step/s]. Limit microstep -> fullstep */
-	5.3,							   /* Holding kval [V]. */
-	5.3,							   /* Constant speed kval [V]. */
-	5.3,							   /* Acceleration starting kval [V]. */
-	5.3,							   /* Deceleration starting kval [V]. */
-	269.9268,							   /* Intersect speed for bemf compensation curve slope changing [step/s]. */
-	0.00072448,						   /* Start slope [s/step]. */
-	0.0016,						   /* Acceleration final slope [s/step]. */
-	0.0016,						   /* Deceleration final slope [s/step]. */
-	0,							   /* Thermal compensation factor (range [0, 15]). */
-	3.5 * 1000 * 1.10,			   /* Ocd threshold [ma] (range [375 ma, 6000 ma]). */
-	3.5 * 1000 * 1.00,			   /* Stall threshold [ma] (range [31.25 ma, 4000 ma]). */
-	StepperMotor::STEP_MODE_HALF, /* Step mode selection. */
-	0xFF,						   /* Alarm conditions enable. */
-	0x2E88						   /* Ic configuration. */
-}};
-
-L6470_init_t initShieldMot2[L6470DAISYCHAINSIZE] = { // init parameters for the motors
-/* First Motor.G */
-{
-	22.0,						    /* Motor supply voltage in V. */
-	200,						   /* Min number of steps per revolution for the motor. = 360/1.8° */
-	1.0,							   /* Max motor phase voltage in A. /!\ UNUSED - USELESS /!\ */
-	3.5,							   /* Max motor phase voltage in V. /!\ UNUSED - USELESS /!\ */
-	0,							   /* Motor initial speed [step/s]. Seems logic at 0*/
-	1500.0,						   /* Motor acceleration [step/s^2] (comment for infinite acceleration mode).*/
-	1500.0,						   /* Motor deceleration [step/s^2] (comment for infinite deceleration mode).*/
-	3000,						   /* Motor maximum speed [step/s]. */
-	0.0,						   /* Motor minimum speed [step/s].*/
-	1500,						   /* Motor full-step speed threshold [step/s]. Limit microstep -> fullstep */
-	5.3,							   /* Holding kval [V]. */
-	5.3,							   /* Constant speed kval [V]. */
-	5.3,							   /* Acceleration starting kval [V]. */
-	5.3,							   /* Deceleration starting kval [V]. */
-	269.9268,							   /* Intersect speed for bemf compensation curve slope changing [step/s]. */
-	0.00072448,						   /* Start slope [s/step]. */
-	0.0016,						   /* Acceleration final slope [s/step]. */
-	0.0016,						   /* Deceleration final slope [s/step]. */
-	0,							   /* Thermal compensation factor (range [0, 15]). */
-	3.5 * 1000 * 1.10,			   /* Ocd threshold [ma] (range [375 ma, 6000 ma]). Calculated with Kval*/
-	3.5 * 1000 * 1.00,			   /* Stall threshold [ma] (range [31.25 ma, 4000 ma]). Calculated Kval */
-	StepperMotor::STEP_MODE_HALF, /* Step mode selection. */
-	0xFF,						   /* Alarm conditions enable. */
-	0x2E88						   /* Ic configuration. */
-},
-
-/* Second Motor. */
-{
-	22.0,							   /* Motor supply voltage in V. */
-	200,						   /* Min number of steps per revolution for the motor. = 360/1.8° */
-	1.0,							   /* Max motor phase voltage in A. /!\ UNUSED - USELESS /!\ */
-	3.5,							   /* Max motor phase voltage in V. /!\ UNUSED - USELESS /!\ */
-	0,							   /* Motor initial speed [step/s]. */
-	1500.0,						   /* Motor acceleration [step/s^2] (comment for infinite acceleration mode). */
-	1500.0,						   /* Motor deceleration [step/s^2] (comment for infinite deceleration mode). */
-	3000,						   /* Motor maximum speed [step/s]. */
-	0.0,						   /* Motor minimum speed [step/s]. */
-	1500,						   /* Motor full-step speed threshold [step/s]. Limit microstep -> fullstep */
-	5.3,							   /* Holding kval [V]. */
-	5.3,							   /* Constant speed kval [V]. */
-	5.3,							   /* Acceleration starting kval [V]. */
-	5.3,							   /* Deceleration starting kval [V]. */
-	269.9268,							   /* Intersect speed for bemf compensation curve slope changing [step/s]. */
-	0.00072448,						   /* Start slope [s/step]. */
-	0.0016,						   /* Acceleration final slope [s/step]. */
-	0.0016,						   /* Deceleration final slope [s/step]. */
-	0,							   /* Thermal compensation factor (range [0, 15]). */
-	3.5 * 1000 * 1.10,			   /* Ocd threshold [ma] (range [375 ma, 6000 ma]). */
-	3.5 * 1000 * 1.00,			   /* Stall threshold [ma] (range [31.25 ma, 4000 ma]). */
-	StepperMotor::STEP_MODE_HALF, /* Step mode selection. */
-	0xFF,						   /* Alarm conditions enable. */
-	0x2E88						   /* Ic configuration. */
-}};
+BlocMoteurs* moteurs;
 
 
 /* USER CODE END PV */
@@ -232,39 +121,62 @@ int main(void)
   MX_TIM2_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
-  char print_msg[50] = "Hello World\n";
-  float tosend1 = 0.1;
+
   HAL_TIM_Base_Start_IT(&htim2);
   HAL_GPIO_TogglePin(LD2_GPIO_Port,LD2_Pin);
-  bottom_shield = new XNucleoIHM02A1(&initShield[0],&initShield[1],&hspi1,reset_shields_GPIO_Port,reset_shields_Pin,ssel1_GPIO_Port,ssel1_Pin);
-  motors = bottom_shield->get_components();
-  HAL_Delay(1000);
-  motors[0]->prepare_run(StepperMotor::direction_t::FWD, 100);
-  motors[1]->prepare_run(StepperMotor::direction_t::BWD, 100);
-  bottom_shield->perform_prepared_actions();
-  HAL_Delay(1000);
-  bottom_shield->perform_prepared_actions();
-  HAL_Delay(1000);
-  bottom_shield->perform_prepared_actions();
-  HAL_Delay(1000);
-  bottom_shield->perform_prepared_actions();
-  HAL_Delay(1000);
+
+  moteurs = new BlocMoteurs(&hspi1, reset_shield_1_GPIO_Port, reset_shield_1_Pin, ssel1_GPIO_Port, ssel1_Pin,
+		  	  	  	  	  	  	    reset_shield_2_GPIO_Port, reset_shield_2_Pin, ssel2_GPIO_Port, ssel2_Pin);
+
+  msg_handler.send_print("Moteurs init");
+  moteurs->motors_on();
+  timer_20_ms_count = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	 HAL_Delay(1000);
-	//msg_handler.send_print(print_msg);
-	 //msg_handler.send_float(tosend1);
-	 HAL_Delay(1000);
+	  timer_20_ms_count = 0;
+	  while(1)
+	  {
 
+			if( msg_handler.get_received_motor_speeds(input_motor_speeds) != true)
+			{
+				if( timer_20_ms_count >= MS_500)
+				{
+					moteurs->motors_stop_soft_hiz();
+					timeout_moteurs = true;
+					timer_20_ms_count = 0;
+					msg_handler.send_print("Moteurs Timeout");
+					break;
+				}
+			}
+			else
+			{
+				moteurs->motors_on();
+				if(timeout_moteurs == true)
+				{
+					msg_handler.send_print("Moteurs exited timeout");
+				}
+				timeout_moteurs = false;
+				break;
+			}
+
+	  }
+	  if(timeout_moteurs == false)
+	  {
+		  while(!timer_20_ms);
+		  moteurs->commande_vitesses_normalisees(input_motor_speeds[front_left], input_motor_speeds[front_right], input_motor_speeds[back_left], input_motor_speeds[back_right]);
+		  msg_handler.send_motor_speeds(moteurs->mesure_vitesses_rad());
+	  }
+	  timer_20_ms = false;
+
+  }
 
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  }
   /* USER CODE END 3 */
 }
 
@@ -290,19 +202,12 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = 16;
-  RCC_OscInitStruct.PLL.PLLN = 360;
+  RCC_OscInitStruct.PLL.PLLM = 8;
+  RCC_OscInitStruct.PLL.PLLN = 156;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 2;
   RCC_OscInitStruct.PLL.PLLR = 2;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /** Activate the Over-Drive mode
-  */
-  if (HAL_PWREx_EnableOverDrive() != HAL_OK)
   {
     Error_Handler();
   }
@@ -345,7 +250,7 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
   hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -478,7 +383,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOA, ssel1_Pin|LD2_Pin|ssel2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(reset_shields_GPIO_Port, reset_shields_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, reset_shield_2_Pin|reset_shield_1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
@@ -493,12 +398,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : reset_shields_Pin */
-  GPIO_InitStruct.Pin = reset_shields_Pin;
+  /*Configure GPIO pins : reset_shield_2_Pin reset_shield_1_Pin */
+  GPIO_InitStruct.Pin = reset_shield_2_Pin|reset_shield_1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(reset_shields_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
@@ -531,6 +436,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   if (htim == &htim2 )
   {
 	  timer_20_ms = true;
+	  if( timer_20_ms_count < MS_500)
+	  {
+		  timer_20_ms_count++;
+	  }
 	  msg_handler.process_timeout();
   }
 }

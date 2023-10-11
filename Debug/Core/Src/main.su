@@ -20,18 +20,18 @@ C:\ST\STM32CubeIDE_1.13.2\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.external
 C:\ST\STM32CubeIDE_1.13.2\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.11.3.rel1.win32_1.1.1.202309131626\tools\arm-none-eabi\include\c++\11.3.1\bits\shared_ptr_base.h:1154:7:std::__shared_ptr<_Tp, _Lp>::~__shared_ptr() [with _Tp = AbstractMsg; __gnu_cxx::_Lock_policy _Lp = __gnu_cxx::_S_single]	16	static
 C:\ST\STM32CubeIDE_1.13.2\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.11.3.rel1.win32_1.1.1.202309131626\tools\bin/../lib/gcc/arm-none-eabi/11.3.1/../../../../arm-none-eabi/include/c++/11.3.1/bits/shared_ptr.h:122:11:std::shared_ptr<AbstractMsg>::~shared_ptr()	16	static
 ../Core/Inc/msg_handler.hpp:17:3:MsgHandler::MsgHandler(UART_HandleTypeDef*)	16	static
-../Core/Inc/XNucleoIHM02A1.h:109:13:L6470** XNucleoIHM02A1::get_components()	16	static
-../Core/Src/main.cpp:206:5:int main()	88	static
-../Core/Src/main.cpp:275:6:void SystemClock_Config()	88	static
-../Core/Src/main.cpp:330:13:void MX_SPI1_Init()	8	static
-../Core/Src/main.cpp:368:13:void MX_TIM2_Init()	32	static
-../Core/Src/main.cpp:413:13:void MX_USART2_UART_Init()	8	static
-../Core/Src/main.cpp:444:13:void MX_DMA_Init()	16	static
-../Core/Src/main.cpp:465:13:void MX_GPIO_Init()	48	static
-../Core/Src/main.cpp:509:6:void HAL_UART_TxCpltCallback(UART_HandleTypeDef*)	16	static
-../Core/Src/main.cpp:519:6:void HAL_UART_RxCpltCallback(UART_HandleTypeDef*)	16	static
-../Core/Src/main.cpp:528:6:void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef*)	16	static
-../Core/Src/main.cpp:545:6:void Error_Handler()	4	static,ignoring_inline_asm
+../Core/Inc/msg_handler.hpp:21:3:MsgHandler::~MsgHandler()	16	static
+../Core/Src/main.cpp:95:5:int main()	40	static
+../Core/Src/main.cpp:187:6:void SystemClock_Config()	88	static
+../Core/Src/main.cpp:235:13:void MX_SPI1_Init()	8	static
+../Core/Src/main.cpp:273:13:void MX_TIM2_Init()	32	static
+../Core/Src/main.cpp:318:13:void MX_USART2_UART_Init()	8	static
+../Core/Src/main.cpp:349:13:void MX_DMA_Init()	16	static
+../Core/Src/main.cpp:370:13:void MX_GPIO_Init()	48	static
+../Core/Src/main.cpp:414:6:void HAL_UART_TxCpltCallback(UART_HandleTypeDef*)	16	static
+../Core/Src/main.cpp:424:6:void HAL_UART_RxCpltCallback(UART_HandleTypeDef*)	16	static
+../Core/Src/main.cpp:433:6:void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef*)	16	static
+../Core/Src/main.cpp:454:6:void Error_Handler()	4	static,ignoring_inline_asm
 C:\ST\STM32CubeIDE_1.13.2\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.11.3.rel1.win32_1.1.1.202309131626\tools\bin/../lib/gcc/arm-none-eabi/11.3.1/../../../../arm-none-eabi/include/c++/11.3.1/bits/unique_ptr.h:210:40:std::__uniq_ptr_data<unsigned char, std::default_delete<unsigned char []>, true, true>::__uniq_ptr_data(std::__uniq_ptr_impl<unsigned char, std::default_delete<unsigned char []> >::pointer) [inherited from std::__uniq_ptr_impl<unsigned char, std::default_delete<unsigned char []> >]	16	static
 C:\ST\STM32CubeIDE_1.13.2\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.11.3.rel1.win32_1.1.1.202309131626\tools\bin/../lib/gcc/arm-none-eabi/11.3.1/../../../../arm-none-eabi/include/c++/11.3.1/bits/unique_ptr.h:547:2:std::unique_ptr<_Tp [], _Dp>::unique_ptr(_Up) [with _Up = unsigned char*; _Vp = std::default_delete<unsigned char []>; <template-parameter-2-3> = void; <template-parameter-2-4> = bool; _Tp = unsigned char; _Dp = std::default_delete<unsigned char []>]	16	static
 C:\ST\STM32CubeIDE_1.13.2\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.11.3.rel1.win32_1.1.1.202309131626\tools\bin/../lib/gcc/arm-none-eabi/11.3.1/../../../../arm-none-eabi/include/c++/11.3.1/bits/unique_ptr.h:608:7:std::unique_ptr<_Tp [], _Dp>::~unique_ptr() [with _Tp = unsigned char; _Dp = std::default_delete<unsigned char []>]	24	static
@@ -106,7 +106,6 @@ C:\ST\STM32CubeIDE_1.13.2\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.external
 ../Core/Inc/msg.hpp:99:3:virtual AckMsg::~AckMsg()	16	static
 ../Core/Inc/msg.hpp:56:3:HeaderClass::~HeaderClass()	16	static
 ../Core/Inc/msg.hpp:56:3:virtual HeaderClass::~HeaderClass()	16	static
-../Core/Inc/msg_handler.hpp:18:3:MsgHandler::~MsgHandler()	16	static
-../Core/Src/main.cpp:554:1:void __static_initialization_and_destruction_0(int, int)	16	static
-../Core/Src/main.cpp:554:1:cpp)	8	static
-../Core/Src/main.cpp:554:1:cpp)	8	static
+../Core/Src/main.cpp:463:1:void __static_initialization_and_destruction_0(int, int)	16	static
+../Core/Src/main.cpp:463:1:cpp)	8	static
+../Core/Src/main.cpp:463:1:cpp)	8	static

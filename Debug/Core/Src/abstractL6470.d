@@ -1,4 +1,5 @@
-Core/Src/main.o: ../Core/Src/main.cpp ../Core/Inc/main.h \
+Core/Src/abstractL6470.o: ../Core/Src/abstractL6470.cpp \
+ ../Core/Inc/L6470.h ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Core/Inc/stm32f4xx_hal_conf.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
@@ -28,11 +29,9 @@ Core/Src/main.o: ../Core/Src/main.cpp ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- ../Core/Inc/msg_handler.hpp ../Core/Inc/main.h ../Core/Inc/msg.hpp \
- ../Core/Inc/XNucleoIHM02A1.h ../Core/Inc/L6470.h ../Core/Inc/L6470_def.h \
- ../Core/Inc/microstepping_motor_def.h ../Core/Inc/StepperMotor.h \
- ../Core/Inc/L6470.tpp ../Core/Inc/BlocMoteurs.hpp \
- ../Core/Inc/XNucleoIHM02A1.h ../Core/Inc/config.hpp
+ ../Core/Inc/L6470_def.h ../Core/Inc/microstepping_motor_def.h \
+ ../Core/Inc/StepperMotor.h ../Core/Inc/L6470.tpp ../Core/Inc/L6470.h
+../Core/Inc/L6470.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
@@ -63,15 +62,8 @@ Core/Src/main.o: ../Core/Src/main.cpp ../Core/Inc/main.h \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
-../Core/Inc/msg_handler.hpp:
-../Core/Inc/main.h:
-../Core/Inc/msg.hpp:
-../Core/Inc/XNucleoIHM02A1.h:
-../Core/Inc/L6470.h:
 ../Core/Inc/L6470_def.h:
 ../Core/Inc/microstepping_motor_def.h:
 ../Core/Inc/StepperMotor.h:
 ../Core/Inc/L6470.tpp:
-../Core/Inc/BlocMoteurs.hpp:
-../Core/Inc/XNucleoIHM02A1.h:
-../Core/Inc/config.hpp:
+../Core/Inc/L6470.h:
