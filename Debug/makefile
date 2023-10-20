@@ -75,8 +75,8 @@ all: main-build
 main-build: stm32_to_ros.elf secondary-outputs
 
 # Tool invocations
-stm32_to_ros.elf stm32_to_ros.map: $(OBJS) $(USER_OBJS) C:\Users\eleves\STM32CubeIDE\workspace_1.13.2\stm32_to_ros\STM32F446RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-g++ -o "stm32_to_ros.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\eleves\STM32CubeIDE\workspace_1.13.2\stm32_to_ros\STM32F446RETX_FLASH.ld" -Wl,-Map="stm32_to_ros.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+stm32_to_ros.elf stm32_to_ros.map: $(OBJS) $(USER_OBJS) /home/adrien/STM32CubeIDE/workspace_1.13.2/stm32_to_ros/STM32F446RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-g++ -o "stm32_to_ros.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/home/adrien/STM32CubeIDE/workspace_1.13.2/stm32_to_ros/STM32F446RETX_FLASH.ld" -Wl,-Map="stm32_to_ros.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

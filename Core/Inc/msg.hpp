@@ -77,13 +77,16 @@ class PayloadClass : public AbstractMsg
 			}
 
 		};
-		~PayloadClass() = default;
-		uint8_t* get_data() const noexcept override {return _data.get();}
+		~PayloadClass()
+		{
+			delete _data;
+		}
+		uint8_t* get_data() const noexcept override {return _data;}
 		msg_type get_type() const noexcept override {return PayloadClass::payload_msg_type;}
 		uint8_t get_data_size() const noexcept override {return _data_size;}
 	private:
 		uint8_t _data_size;
-		std::unique_ptr<uint8_t[]> _data;
+		uint8_t* _data;
 };
 class AckMsg : public AbstractMsg
 {

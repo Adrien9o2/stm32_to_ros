@@ -43,7 +43,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-#define MS_500 25
+#define MS_500 100
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -52,17 +52,12 @@ SPI_HandleTypeDef hspi1;
 TIM_HandleTypeDef htim2;
 
 UART_HandleTypeDef huart2;
-DMA_HandleTypeDef hdma_usart2_tx;
-DMA_HandleTypeDef hdma_usart2_rx;
 
 /* USER CODE BEGIN PV */
 
 
 MsgHandler msg_handler(&huart2);
-float to_send = 0.1;
-bool oneof2led = false;
-bool timer_20_ms = false;
-int timer_20_ms_count = 0;
+int timer_timeout_count = 0;
 float input_motor_speeds[4] {0.0,0.0,0.0,0.0};
 bool timeout_moteurs = false;
 
@@ -74,7 +69,6 @@ BlocMoteurs* moteurs;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_DMA_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_SPI1_Init(void);
@@ -116,39 +110,35 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_DMA_Init();
   MX_USART2_UART_Init();
   MX_TIM2_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
 
   HAL_TIM_Base_Start_IT(&htim2);
-  HAL_GPIO_TogglePin(LD2_GPIO_Port,LD2_Pin);
 
   moteurs = new BlocMoteurs(&hspi1, reset_shield_1_GPIO_Port, reset_shield_1_Pin, ssel1_GPIO_Port, ssel1_Pin,
 		  	  	  	  	  	  	    reset_shield_2_GPIO_Port, reset_shield_2_Pin, ssel2_GPIO_Port, ssel2_Pin);
 
-  msg_handler.send_print("Moteurs init");
+  msg_handler.launch_handler();
   moteurs->motors_on();
-  timer_20_ms_count = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  timer_20_ms_count = 0;
+	  timer_timeout_count = 0;
 	  while(1)
 	  {
 
 			if( msg_handler.get_received_motor_speeds(input_motor_speeds) != true)
 			{
-				if( timer_20_ms_count >= MS_500)
+				if( timer_timeout_count >= MS_500)
 				{
 					moteurs->motors_stop_soft_hiz();
 					timeout_moteurs = true;
-					timer_20_ms_count = 0;
-					msg_handler.send_print("Moteurs Timeout");
+					//msg_handler.send_print("Moteurs Timeout");
 					break;
 				}
 			}
@@ -157,7 +147,7 @@ int main(void)
 				moteurs->motors_on();
 				if(timeout_moteurs == true)
 				{
-					msg_handler.send_print("Moteurs exited timeout");
+					//msg_handler.send_print("Moteurs exited timeout");
 				}
 				timeout_moteurs = false;
 				break;
@@ -166,11 +156,18 @@ int main(void)
 	  }
 	  if(timeout_moteurs == false)
 	  {
-		  while(!timer_20_ms);
 		  moteurs->commande_vitesses_normalisees(input_motor_speeds[front_left], input_motor_speeds[front_right], input_motor_speeds[back_left], input_motor_speeds[back_right]);
-		  msg_handler.send_motor_speeds(moteurs->mesure_vitesses_rad());
+		  if( fabs(input_motor_speeds[front_left]-0.5) < 0.01)
+		  {
+			  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PinState::GPIO_PIN_SET);
+		  }
+		  else
+		  {
+			  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PinState::GPIO_PIN_RESET);
+		  }
+		  moteurs->mesure_vitesses_rad();
+		  //msg_handler.send_motor_speeds(moteurs->mesure_vitesses_rad());
 	  }
-	  timer_20_ms = false;
 
   }
 
@@ -286,7 +283,7 @@ static void MX_TIM2_Init(void)
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 0;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 450000;
+  htim2.Init.Period = 390000;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -326,7 +323,7 @@ static void MX_USART2_UART_Init(void)
 
   /* USER CODE END USART2_Init 1 */
   huart2.Instance = USART2;
-  huart2.Init.BaudRate = 115200;
+  huart2.Init.BaudRate = 1152000;
   huart2.Init.WordLength = UART_WORDLENGTH_8B;
   huart2.Init.StopBits = UART_STOPBITS_1;
   huart2.Init.Parity = UART_PARITY_NONE;
@@ -340,25 +337,6 @@ static void MX_USART2_UART_Init(void)
   /* USER CODE BEGIN USART2_Init 2 */
 
   /* USER CODE END USART2_Init 2 */
-
-}
-
-/**
-  * Enable DMA controller clock
-  */
-static void MX_DMA_Init(void)
-{
-
-  /* DMA controller clock enable */
-  __HAL_RCC_DMA1_CLK_ENABLE();
-
-  /* DMA interrupt init */
-  /* DMA1_Stream5_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn);
-  /* DMA1_Stream6_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Stream6_IRQn);
 
 }
 
@@ -435,12 +413,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   // Check which version of the timer triggered this callback and toggle LED
   if (htim == &htim2 )
   {
-	  timer_20_ms = true;
-	  if( timer_20_ms_count < MS_500)
+	  /*
+	  if( timer_timeout_count < MS_500)
 	  {
-		  timer_20_ms_count++;
+		  timer_timeout_count++;
 	  }
 	  msg_handler.process_timeout();
+	  */
   }
 }
 
