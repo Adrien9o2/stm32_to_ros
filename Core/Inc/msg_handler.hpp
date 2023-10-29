@@ -49,4 +49,5 @@ class MsgHandler
 		std::shared_ptr<AbstractMsg> registered_msg;
 		float* motor_speeds;
 		bool launched;
+		bool abort_clpt;
 };

@@ -121,7 +121,8 @@ int main(void)
 		  	  	  	  	  	  	    reset_shield_2_GPIO_Port, reset_shield_2_Pin, ssel2_GPIO_Port, ssel2_Pin);
 
   msg_handler.launch_handler();
-  moteurs->motors_on();
+  //msg_handler.send_print("Hello");
+  //moteurs->motors_on();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -136,18 +137,18 @@ int main(void)
 			{
 				if( timer_timeout_count >= MS_500)
 				{
-					moteurs->motors_stop_soft_hiz();
+					//moteurs->motors_stop_soft_hiz();
 					timeout_moteurs = true;
-					//msg_handler.send_print("Moteurs Timeout");
+					//msg_handler.send_print("Motors Timeout");
 					break;
 				}
 			}
 			else
 			{
-				moteurs->motors_on();
+				//moteurs->motors_on();
 				if(timeout_moteurs == true)
 				{
-					//msg_handler.send_print("Moteurs exited timeout");
+					//msg_handler.send_print("Motors exited timeout");
 				}
 				timeout_moteurs = false;
 				break;
@@ -156,16 +157,19 @@ int main(void)
 	  }
 	  if(timeout_moteurs == false)
 	  {
-		  moteurs->commande_vitesses_normalisees(input_motor_speeds[front_left], input_motor_speeds[front_right], input_motor_speeds[back_left], input_motor_speeds[back_right]);
-		  if( fabs(input_motor_speeds[front_left]-0.5) < 0.01)
+		  if( fabs(input_motor_speeds[front_left]) < 0.001 && fabs(input_motor_speeds[front_right]) < 0.001 )
 		  {
-			  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PinState::GPIO_PIN_SET);
+			  HAL_GPIO_WritePin(LD2_GPIO_Port , LD2_Pin, GPIO_PinState::GPIO_PIN_SET);
 		  }
 		  else
 		  {
-			  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PinState::GPIO_PIN_RESET);
+			  HAL_GPIO_WritePin(LD2_GPIO_Port , LD2_Pin, GPIO_PinState::GPIO_PIN_RESET);
 		  }
-		  moteurs->mesure_vitesses_rad();
+		  //char to_send[50];
+		  //sprintf(to_send,"got : %f %f %f %f",input_motor_speeds[front_left],input_motor_speeds[front_right],input_motor_speeds[back_left],input_motor_speeds[back_right]);
+		  //msg_handler.send_print(to_send);
+		  //moteurs->commande_vitesses_normalisees(input_motor_speeds[front_left], input_motor_speeds[front_right], input_motor_speeds[back_left], input_motor_speeds[back_right]);
+		  //moteurs->mesure_vitesses_rad();
 		  //msg_handler.send_motor_speeds(moteurs->mesure_vitesses_rad());
 	  }
 
@@ -200,11 +204,18 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
   RCC_OscInitStruct.PLL.PLLM = 8;
-  RCC_OscInitStruct.PLL.PLLN = 156;
+  RCC_OscInitStruct.PLL.PLLN = 180;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 2;
   RCC_OscInitStruct.PLL.PLLR = 2;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Activate the Over-Drive mode
+  */
+  if (HAL_PWREx_EnableOverDrive() != HAL_OK)
   {
     Error_Handler();
   }
@@ -323,7 +334,7 @@ static void MX_USART2_UART_Init(void)
 
   /* USER CODE END USART2_Init 1 */
   huart2.Instance = USART2;
-  huart2.Init.BaudRate = 1152000;
+  huart2.Init.BaudRate = 9600;
   huart2.Init.WordLength = UART_WORDLENGTH_8B;
   huart2.Init.StopBits = UART_STOPBITS_1;
   huart2.Init.Parity = UART_PARITY_NONE;
@@ -413,13 +424,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   // Check which version of the timer triggered this callback and toggle LED
   if (htim == &htim2 )
   {
-	  /*
 	  if( timer_timeout_count < MS_500)
 	  {
 		  timer_timeout_count++;
+		  msg_handler.process_timeout();
 	  }
-	  msg_handler.process_timeout();
-	  */
+
   }
 }
 

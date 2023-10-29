@@ -7,6 +7,10 @@ void MsgHandler::process_txclpt_callback()
 	{
 		check_tx_list();
 	}
+	else if (ongoing_fetch == true)
+	{
+		receive_data();
+	}
 
 }
 
@@ -167,12 +171,14 @@ void MsgHandler::transmit_front_msg()
 void MsgHandler::receive_ack()
 {
 	HAL_UART_Abort(huart);
+	__HAL_UART_CLEAR_FLAG(huart, UART_FLAG_ORE);
 	HAL_UART_Receive_IT(huart, rxSingleack.get_data(), rxSingleack.get_data_size());
 }
 void MsgHandler::receive_data_header()
 {
 	//HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PinState::GPIO_PIN_SET);
 	HAL_UART_Abort(huart);
+	__HAL_UART_CLEAR_FLAG(huart, UART_FLAG_ORE);
 	HAL_UART_Receive_IT(huart, rxHeader.get_data(), rxHeader.get_data_size());
 }
 void MsgHandler::ack_msg_motor_speeds()
@@ -187,7 +193,6 @@ void MsgHandler::ack_msg_motor_speeds()
 	txSingleack.get_data()[1] = SerialID::MSG_MOTOR_SPEEDS;
 	txSingleack.get_data()[2] = 4*sizeof(float);
 	HAL_UART_Abort(huart);
-	HAL_UART_Receive_IT(huart, incoming_data->get_data(), incoming_data->get_data_size());
 	HAL_UART_Transmit_IT(huart, txSingleack.get_data(), txSingleack.get_data_size());
 
 }
@@ -211,6 +216,7 @@ void MsgHandler::ack_msg_print(uint8_t msg_len)
 void MsgHandler::receive_data()
 {
 	HAL_UART_Abort(huart);
+	__HAL_UART_CLEAR_FLAG(huart, UART_FLAG_ORE);
 	HAL_UART_Receive_IT(huart, incoming_data->get_data(), incoming_data->get_data_size());
 }
 
