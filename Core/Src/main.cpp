@@ -427,7 +427,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	  if( timer_timeout_count < MS_500)
 	  {
 		  timer_timeout_count++;
-		  msg_handler.process_timeout();
 	  }
 
   }
