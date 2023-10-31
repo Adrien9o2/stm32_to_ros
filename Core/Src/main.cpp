@@ -43,7 +43,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-#define MS_500 100
+
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -119,8 +119,8 @@ int main(void)
 
   moteurs = new BlocMoteurs(&hspi1, reset_shield_1_GPIO_Port, reset_shield_1_Pin, ssel1_GPIO_Port, ssel1_Pin,
 		  	  	  	  	  	  	    reset_shield_2_GPIO_Port, reset_shield_2_Pin, ssel2_GPIO_Port, ssel2_Pin);
-
-  msg_handler.launch_handler();
+  moteurs->set_microstepping_mode(step_mode_t::STEP_MODE_1_128);
+  moteurs->set_max_acc_moteurs(1.0);
   //msg_handler.send_print("Hello");
   //moteurs->motors_on();
   /* USER CODE END 2 */
@@ -129,27 +129,22 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  timer_timeout_count = 0;
+	  msg_handler.prepare_receive_motor_speeds();
 	  while(1)
 	  {
 
 			if( msg_handler.get_received_motor_speeds(input_motor_speeds) != true)
 			{
-				if( timer_timeout_count >= MS_500)
+				if( timer_timeout_count >= 5)
 				{
-					//moteurs->motors_stop_soft_hiz();
+					moteurs->motors_stop_soft_hiz();
 					timeout_moteurs = true;
-					//msg_handler.send_print("Motors Timeout");
 					break;
 				}
 			}
 			else
 			{
-				//moteurs->motors_on();
-				if(timeout_moteurs == true)
-				{
-					//msg_handler.send_print("Motors exited timeout");
-				}
+				moteurs->motors_on();
 				timeout_moteurs = false;
 				break;
 			}
@@ -165,13 +160,11 @@ int main(void)
 		  {
 			  HAL_GPIO_WritePin(LD2_GPIO_Port , LD2_Pin, GPIO_PinState::GPIO_PIN_RESET);
 		  }
-		  //char to_send[50];
-		  //sprintf(to_send,"got : %f %f %f %f",input_motor_speeds[front_left],input_motor_speeds[front_right],input_motor_speeds[back_left],input_motor_speeds[back_right]);
-		  //msg_handler.send_print(to_send);
-		  //moteurs->commande_vitesses_normalisees(input_motor_speeds[front_left], input_motor_speeds[front_right], input_motor_speeds[back_left], input_motor_speeds[back_right]);
-		  //moteurs->mesure_vitesses_rad();
-		  //msg_handler.send_motor_speeds(moteurs->mesure_vitesses_rad());
+		  moteurs->commande_vitesses_absolues(input_motor_speeds[front_left], input_motor_speeds[front_right], input_motor_speeds[back_left], input_motor_speeds[back_right]);
+		  moteurs->mesure_vitesses_rad();
+		  msg_handler.send_motor_speeds(moteurs->mesure_vitesses_rad());
 	  }
+	  timer_timeout_count = 0;
 
   }
 
@@ -294,7 +287,7 @@ static void MX_TIM2_Init(void)
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 0;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 390000;
+  htim2.Init.Period = 1800000;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -334,7 +327,7 @@ static void MX_USART2_UART_Init(void)
 
   /* USER CODE END USART2_Init 1 */
   huart2.Instance = USART2;
-  huart2.Init.BaudRate = 9600;
+  huart2.Init.BaudRate = 115200;
   huart2.Init.WordLength = UART_WORDLENGTH_8B;
   huart2.Init.StopBits = UART_STOPBITS_1;
   huart2.Init.Parity = UART_PARITY_NONE;
@@ -424,9 +417,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   // Check which version of the timer triggered this callback and toggle LED
   if (htim == &htim2 )
   {
-	  if( timer_timeout_count < MS_500)
+
+	  timer_timeout_count++;
+	  if (timer_timeout_count > 10)
 	  {
-		  timer_timeout_count++;
+		  msg_handler.unlock_timeout();
 	  }
 
   }
