@@ -25,6 +25,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 # include "msg_handler.hpp"
+# include "XNucleoIHM02A1.h"
+#include "BlocMoteurs.hpp"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -45,20 +47,21 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+SPI_HandleTypeDef hspi1;
+
 TIM_HandleTypeDef htim2;
 
 UART_HandleTypeDef huart2;
-DMA_HandleTypeDef hdma_usart2_tx;
-DMA_HandleTypeDef hdma_usart2_rx;
 
 /* USER CODE BEGIN PV */
 
 
 MsgHandler msg_handler(&huart2);
-float to_send = 0.1;
-bool oneof2led = false;
-bool timer_20_ms = false;
+int timer_timeout_count = 0;
+float input_motor_speeds[4] {0.0,0.0,0.0,0.0};
+bool timeout_moteurs = false;
 
+BlocMoteurs* moteurs;
 
 
 /* USER CODE END PV */
@@ -66,9 +69,9 @@ bool timer_20_ms = false;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_DMA_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_TIM2_Init(void);
+static void MX_SPI1_Init(void);
 /* USER CODE BEGIN PFP */
 void send_print(const char* msg);
 void send_float(float float_to_send);
@@ -107,30 +110,67 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_DMA_Init();
   MX_USART2_UART_Init();
   MX_TIM2_Init();
+  MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
-  char print_msg[50] = "Hello World\n";
-  float tosend1 = 0.1;
+
   HAL_TIM_Base_Start_IT(&htim2);
-  HAL_GPIO_TogglePin(LD2_GPIO_Port,LD2_Pin);
+
+  moteurs = new BlocMoteurs(&hspi1, reset_shield_1_GPIO_Port, reset_shield_1_Pin, ssel1_GPIO_Port, ssel1_Pin,
+		  	  	  	  	  	  	    reset_shield_2_GPIO_Port, reset_shield_2_Pin, ssel2_GPIO_Port, ssel2_Pin);
+  moteurs->set_microstepping_mode(step_mode_t::STEP_MODE_1_128);
+  moteurs->set_max_acc_moteurs(1.0);
+  //msg_handler.send_print("Hello");
+  //moteurs->motors_on();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	 HAL_Delay(1000);
-	 msg_handler.send_print(print_msg);
-	 msg_handler.send_float(tosend1);
-	 HAL_Delay(1000);
+	  msg_handler.prepare_receive_motor_speeds();
+	  while(1)
+	  {
 
+			if( msg_handler.get_received_motor_speeds(input_motor_speeds) != true)
+			{
+				if( timer_timeout_count >= 5)
+				{
+					moteurs->motors_stop_soft_hiz();
+					timeout_moteurs = true;
+					break;
+				}
+			}
+			else
+			{
+				moteurs->motors_on();
+				timeout_moteurs = false;
+				break;
+			}
+
+	  }
+	  if(timeout_moteurs == false)
+	  {
+		  if( fabs(input_motor_speeds[front_left]) < 0.001 && fabs(input_motor_speeds[front_right]) < 0.001 )
+		  {
+			  HAL_GPIO_WritePin(LD2_GPIO_Port , LD2_Pin, GPIO_PinState::GPIO_PIN_SET);
+		  }
+		  else
+		  {
+			  HAL_GPIO_WritePin(LD2_GPIO_Port , LD2_Pin, GPIO_PinState::GPIO_PIN_RESET);
+		  }
+		  moteurs->commande_vitesses_absolues(input_motor_speeds[front_left], input_motor_speeds[front_right], input_motor_speeds[back_left], input_motor_speeds[back_right]);
+		  moteurs->mesure_vitesses_rad();
+		  msg_handler.send_motor_speeds(moteurs->mesure_vitesses_rad());
+	  }
+	  timer_timeout_count = 0;
+
+  }
 
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  }
   /* USER CODE END 3 */
 }
 
@@ -156,8 +196,8 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = 16;
-  RCC_OscInitStruct.PLL.PLLN = 360;
+  RCC_OscInitStruct.PLL.PLLM = 8;
+  RCC_OscInitStruct.PLL.PLLN = 180;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 2;
   RCC_OscInitStruct.PLL.PLLR = 2;
@@ -186,6 +226,44 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief SPI1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_SPI1_Init(void)
+{
+
+  /* USER CODE BEGIN SPI1_Init 0 */
+
+  /* USER CODE END SPI1_Init 0 */
+
+  /* USER CODE BEGIN SPI1_Init 1 */
+
+  /* USER CODE END SPI1_Init 1 */
+  /* SPI1 parameter configuration*/
+  hspi1.Instance = SPI1;
+  hspi1.Init.Mode = SPI_MODE_MASTER;
+  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
+  hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
+  hspi1.Init.NSS = SPI_NSS_SOFT;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
+  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi1.Init.CRCPolynomial = 10;
+  if (HAL_SPI_Init(&hspi1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN SPI1_Init 2 */
+
+  /* USER CODE END SPI1_Init 2 */
+
 }
 
 /**
@@ -267,25 +345,6 @@ static void MX_USART2_UART_Init(void)
 }
 
 /**
-  * Enable DMA controller clock
-  */
-static void MX_DMA_Init(void)
-{
-
-  /* DMA controller clock enable */
-  __HAL_RCC_DMA1_CLK_ENABLE();
-
-  /* DMA interrupt init */
-  /* DMA1_Stream5_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn);
-  /* DMA1_Stream6_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Stream6_IRQn);
-
-}
-
-/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -303,7 +362,10 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, ssel1_Pin|LD2_Pin|ssel2_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, reset_shield_2_Pin|reset_shield_1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
@@ -311,12 +373,19 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : LD2_Pin */
-  GPIO_InitStruct.Pin = LD2_Pin;
+  /*Configure GPIO pins : ssel1_Pin LD2_Pin ssel2_Pin */
+  GPIO_InitStruct.Pin = ssel1_Pin|LD2_Pin|ssel2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : reset_shield_2_Pin reset_shield_1_Pin */
+  GPIO_InitStruct.Pin = reset_shield_2_Pin|reset_shield_1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
@@ -348,8 +417,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   // Check which version of the timer triggered this callback and toggle LED
   if (htim == &htim2 )
   {
-	  timer_20_ms = true;
-	  msg_handler.process_timeout();
+
+	  timer_timeout_count++;
+	  if (timer_timeout_count > 10)
+	  {
+		  msg_handler.unlock_timeout();
+	  }
+
   }
 }
 
