@@ -1,7 +1,6 @@
 # STM32 Cube IDE to ROS2 motor pilot and monitoring
 ## Driving 4 stepper motors from ROS2
 
-[![N|Solid](https://www.st.com/content/dam/st-crew/developer-zone/jump-start/logo-stm32cubeide.png)](https://www.st.com/content/st_com/en/stm32cubeide.html)
 
 ## Harware requirements
 
@@ -39,13 +38,13 @@
 From brand new motor driver, several steps are to be taken.
 On one of the shield, that will be reffered as the **top shield** :
 
-**Move ==SB23== solder bridge from ==SB23== to ==SB7== using a solder iron.**
+**Move SB23 solder bridge from SB23 to SB7 using a solder iron.**
 | ℹ️ Note                         | 
 |------------------------------------------|
 | Since the MCU communicates with the driver using SPI protol, that step is to be taken in order to change the hardware configuration of one of the 2 shield so that the selection pin of the SPI protol is not the same for both shields (it would create a conflict otherwise)|
 
 The motor shields have the same reset pin, but contrary to SPI selection pin, there is no solder bridge to change that configuration. That is why on top shield you should :
-**Bend the pin ont the ==top shield== that would go on the ==PB5=D4==  pin of the MCU (obviously the one on the Arduino CM9 morpho header)**
+**Bend the pin ont the top shield that would go on the PB5=D4  pin of the MCU (obviously the one on the Arduino CM9 morpho header)**
 
 With those changes, the pin used by the 2 drivers are :
 | Function | Bottom shield | Top Shield |
@@ -53,8 +52,8 @@ With those changes, the pin used by the 2 drivers are :
 | spi SDI = MOSI | PA7 = D11 | PA7 = D11 |
 | spi SDO = MISO | PA6 = D12 | PA6 = D12 | 
 | spi SCK | PB3 = D3 | PB3 = D3 |
-| spi NCS | ==PA4 = A2== | ==PA10 = D2== | 
-| Reset pin | ==PB5 = D4== | ==PB4 = D5== | 
+| spi NCS | PA4 = A2 | PA10 = D2 | 
+| Reset pin | PB5 = D4 | PB4 = D5 | 
 
 | ⚠️ Warning                               | 
 |------------------------------------------|
