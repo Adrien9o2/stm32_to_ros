@@ -1,15 +1,7 @@
 /**
  ******************************************************************************
- * @file    microstepping_motor_def.h
- * @author  IPD SYSTEM LAB & TECH MKTG
- * @version V0.0.1
- * @date    04-June-2015
- * @brief   This file contains all the functions prototypes for the microstepping
- *          motor driver with motion engine.   
- ******************************************************************************
- * @attention
  *
- * <h2><center>&copy; COPYRIGHT(c) 2014 STMicroelectronics</center></h2>
+ * COPYRIGHT(c) 2014 STMicroelectronics
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -34,8 +26,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************
- */ 
-
+ */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 
