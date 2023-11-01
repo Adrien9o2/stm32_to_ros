@@ -55,12 +55,21 @@ UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 
-
+//Msg handler is built over huart2 (usb) and will handle UART communication
+// with the stm32_to_ros_node
 MsgHandler msg_handler(&huart2);
+
+//counter increased each Timer2 interrupt (currently 20ms)
 int timer_timeout_count = 0;
+
+//Tab of motor_speeds received from msg_handler
 float input_motor_speeds[4] {0.0,0.0,0.0,0.0};
+
+//Flag to control a timeout state
+//Timeout occurs if no data was received from serial in a long time
 bool timeout_moteurs = false;
 
+//Class handling motors
 BlocMoteurs* moteurs;
 
 
@@ -115,36 +124,43 @@ int main(void)
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
 
+
+  //Start Timer2 interrupt (every 20 ms here)
   HAL_TIM_Base_Start_IT(&htim2);
 
+  //Init motor class
   moteurs = new BlocMoteurs(&hspi1, reset_shield_1_GPIO_Port, reset_shield_1_Pin, ssel1_GPIO_Port, ssel1_Pin,
 		  	  	  	  	  	  	    reset_shield_2_GPIO_Port, reset_shield_2_Pin, ssel2_GPIO_Port, ssel2_Pin);
+  
+  //Set microstepping to 128 for smooth rotations
   moteurs->set_microstepping_mode(step_mode_t::STEP_MODE_1_128);
+
+  //Set max acc to 1 rad/s^2
   moteurs->set_max_acc_moteurs(1.0);
-  //msg_handler.send_print("Hello");
-  //moteurs->motors_on();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    //Ask handler to fetch motor_speeds (UART_RECEIVE_IT)
 	  msg_handler.prepare_receive_motor_speeds();
 	  while(1)
 	  {
 
 			if( msg_handler.get_received_motor_speeds(input_motor_speeds) != true)
 			{
-				if( timer_timeout_count >= 5)
+				if( timer_timeout_count >= 5) // 5*TIM2_INTERRUPT_PERIOD(20m) -> Timeout 100ms
 				{
-					moteurs->motors_stop_soft_hiz();
+					moteurs->motors_stop_soft_hiz(); // stop motors
 					timeout_moteurs = true;
 					break;
 				}
 			}
 			else
 			{
-				moteurs->motors_on();
+				moteurs->motors_on(); // toggle motors on in case it was stopped with motor_stop
 				timeout_moteurs = false;
 				break;
 			}
@@ -152,18 +168,12 @@ int main(void)
 	  }
 	  if(timeout_moteurs == false)
 	  {
-		  if( fabs(input_motor_speeds[front_left]) < 0.001 && fabs(input_motor_speeds[front_right]) < 0.001 )
-		  {
-			  HAL_GPIO_WritePin(LD2_GPIO_Port , LD2_Pin, GPIO_PinState::GPIO_PIN_SET);
-		  }
-		  else
-		  {
-			  HAL_GPIO_WritePin(LD2_GPIO_Port , LD2_Pin, GPIO_PinState::GPIO_PIN_RESET);
-		  }
+      //Apply received_motor_speeds
 		  moteurs->commande_vitesses_absolues(input_motor_speeds[front_left], input_motor_speeds[front_right], input_motor_speeds[back_left], input_motor_speeds[back_right]);
-		  moteurs->mesure_vitesses_rad();
+		  //Measure and send motor speeds
 		  msg_handler.send_motor_speeds(moteurs->mesure_vitesses_rad());
 	  }
+    //reset counter for next loop
 	  timer_timeout_count = 0;
 
   }
@@ -393,6 +403,7 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
+//Redirect Uart callback to msg_handler if huart is huart2 peripheral
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
 	if (huart == &huart2)
@@ -403,6 +414,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 
 }
 
+//Redirect Uart callback to msg_handler if huart is huart2 peripheral
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	if( huart == &huart2)
@@ -412,6 +424,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 }
 
+//Timer 2 interrupt (every 20ms)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   // Check which version of the timer triggered this callback and toggle LED
@@ -419,7 +432,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   {
 
 	  timer_timeout_count++;
-	  if (timer_timeout_count > 10)
+	  if (timer_timeout_count > 10) //in case of a timeout, reset flags that may lock the logic of the msg_handler 
 	  {
 		  msg_handler.unlock_timeout();
 	  }
