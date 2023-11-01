@@ -47,7 +47,9 @@ using namespace StepperMotor;
 /* Classes -------------------------------------------------------------------*/
 
 
-
+//We use dummy class shield_1, shield_2, shield_3 in order to template a L6470 class
+//The action of templating allows to separate static variables shared among instances of the same class
+//Indeed L6470 class used by st  with XNucleoIHM02A1 was not meant to use more than one shield even though it has the hardware capabilities.
 class shield_1
 {
 	public:
@@ -89,7 +91,7 @@ typedef enum
     PREPARED_SET_MARK
 } prepared_action_t;
 
-
+//In order to manipulate each templated L6470 class with the same pointer we define an absract class (polymorphism)
 class abstractL6470
 {
 	public:
