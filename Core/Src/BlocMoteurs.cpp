@@ -36,8 +36,8 @@ BlocMoteurs::BlocMoteurs(SPI_HandleTypeDef *spi,
 	#else
 		moteurs[front_left] = moteurs_shield_2[left];
 		moteurs[front_right] = moteurs_shield_2[right];
-		moteurs[back_left] = moteurs_shield_1[left];
-		moteurs[back_right] = moteurs_shield_1[right];
+		moteurs[back_left] = moteurs_shield_1[1];
+		moteurs[back_right] = moteurs_shield_1[0];
 	#endif
 
 
@@ -91,7 +91,7 @@ void BlocMoteurs::commande_vitesses_normalisees(float vitesse_normalisee_FL, flo
     /////////////////////////////////////////////////////////////
 
     // Détermination du signe des vitesses (logique inversée entre les deux moteurs car placés symétriquement sur le robot et branchement identique)
-    StepperMotor::direction_t sens_FL = vitesse_normalisee_FL >= 0.0f ? StepperMotor::FWD : StepperMotor::BWD;
+    StepperMotor::direction_t sens_FL = vitesse_normalisee_FL >= 0.0f ? StepperMotor::FWD : StepperMotor::BWD;;
     StepperMotor::direction_t sens_FR = vitesse_normalisee_FR >= 0.0f ? StepperMotor::BWD : StepperMotor::FWD;
     StepperMotor::direction_t sens_BL = vitesse_normalisee_BL >= 0.0f ? StepperMotor::FWD : StepperMotor::BWD;
     StepperMotor::direction_t sens_BR = vitesse_normalisee_BR >= 0.0f ? StepperMotor::BWD : StepperMotor::FWD;

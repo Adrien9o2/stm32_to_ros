@@ -132,11 +132,22 @@ int main(void)
   moteurs = new BlocMoteurs(&hspi1, reset_shield_1_GPIO_Port, reset_shield_1_Pin, ssel1_GPIO_Port, ssel1_Pin,
 		  	  	  	  	  	  	    reset_shield_2_GPIO_Port, reset_shield_2_Pin, ssel2_GPIO_Port, ssel2_Pin);
   
-  //Set microstepping to 128 for smooth rotations
-  moteurs->set_microstepping_mode(step_mode_t::STEP_MODE_1_128);
 
-  //Set max acc to 1 rad/s^2
-  moteurs->set_max_acc_moteurs(1.0);
+  //Set microstepping to 128 for smooth rotations
+  moteurs->set_microstepping_mode(step_mode_t::STEP_MODE_FULL);
+
+  /*
+  moteurs->motors_on();
+  moteurs->commande_vitesses_absolues(1.0, 0.0, 0.0, 0.0);
+  HAL_Delay(1000);
+  moteurs->commande_vitesses_absolues(0.0, 1.0, 0.0, 0.0);
+  HAL_Delay(1000);
+  moteurs->commande_vitesses_absolues(0.0, 0.0, 1.0, 0.0);
+  HAL_Delay(1000);
+  moteurs->commande_vitesses_absolues(0.0, 0.0, 0.0, 1.0);
+  HAL_Delay(1000);
+  moteurs->motors_stop_hard();
+  */
 
   /* USER CODE END 2 */
 

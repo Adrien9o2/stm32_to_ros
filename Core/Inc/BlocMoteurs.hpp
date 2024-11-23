@@ -9,7 +9,6 @@
 #include "config.hpp"
 
 
-#define CANONICAL_DIR
 #define NMOTEURS 4
 #define XMECANUM_SHAPE
 
