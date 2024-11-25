@@ -1,16 +1,16 @@
 ../Core/Inc/msg_handler.hpp:19:3:MsgHandler::MsgHandler(UART_HandleTypeDef*)	16	static
 ../Core/Inc/msg_handler.hpp:29:3:MsgHandler::~MsgHandler()	16	static
 ../Core/Inc/msg_handler.hpp:38:8:bool MsgHandler::unlock_timeout()	16	static
-../Core/Src/main.cpp:98:5:int main()	40	static
-../Core/Src/main.cpp:202:6:void SystemClock_Config()	88	static
-../Core/Src/main.cpp:257:13:void MX_SPI1_Init()	8	static
-../Core/Src/main.cpp:295:13:void MX_TIM2_Init()	32	static
-../Core/Src/main.cpp:340:13:void MX_USART2_UART_Init()	8	static
-../Core/Src/main.cpp:373:13:void MX_GPIO_Init()	48	static
-../Core/Src/main.cpp:418:6:void HAL_UART_TxCpltCallback(UART_HandleTypeDef*)	16	static
-../Core/Src/main.cpp:429:6:void HAL_UART_RxCpltCallback(UART_HandleTypeDef*)	16	static
-../Core/Src/main.cpp:439:6:void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef*)	16	static
-../Core/Src/main.cpp:461:6:void Error_Handler()	4	static,ignoring_inline_asm
-../Core/Src/main.cpp:470:1:void __static_initialization_and_destruction_0(int, int)	16	static
-../Core/Src/main.cpp:470:1:cpp)	8	static
-../Core/Src/main.cpp:470:1:cpp)	8	static
+../Core/Src/main.cpp:101:5:int main()	72	static
+../Core/Src/main.cpp:249:6:void SystemClock_Config()	88	static
+../Core/Src/main.cpp:304:13:void MX_SPI1_Init()	8	static
+../Core/Src/main.cpp:342:13:void MX_TIM2_Init()	32	static
+../Core/Src/main.cpp:387:13:void MX_USART2_UART_Init()	8	static
+../Core/Src/main.cpp:420:13:void MX_GPIO_Init()	48	static
+../Core/Src/main.cpp:465:6:void HAL_UART_TxCpltCallback(UART_HandleTypeDef*)	16	static
+../Core/Src/main.cpp:476:6:void HAL_UART_RxCpltCallback(UART_HandleTypeDef*)	16	static
+../Core/Src/main.cpp:486:6:void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef*)	16	static
+../Core/Src/main.cpp:508:6:void Error_Handler()	4	static,ignoring_inline_asm
+../Core/Src/main.cpp:517:1:void __static_initialization_and_destruction_0(int, int)	16	static
+../Core/Src/main.cpp:517:1:cpp)	8	static
+../Core/Src/main.cpp:517:1:cpp)	8	static

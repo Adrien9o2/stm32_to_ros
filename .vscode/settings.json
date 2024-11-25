@@ -1,0 +1,7 @@
+{
+    "autodoxygen.language": "english",
+    "autodoxygen.author": "ako",
+    "files.associations": {
+        "*.tpp": "cpp"
+    }
+}

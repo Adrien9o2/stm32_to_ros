@@ -64,10 +64,13 @@ int timer_timeout_count = 0;
 
 //Tab of motor_speeds received from msg_handler
 float input_motor_speeds[4] {0.0,0.0,0.0,0.0};
+float distance_totale[4] = {0.0,0.0,0.0,0.0};
 
 //Flag to control a timeout state
 //Timeout occurs if no data was received from serial in a long time
 bool timeout_moteurs = false;
+int32_t *mesure_pas_ecoulees;
+int32_t somme_mesure_pas_ecoulees[4];
 
 //Class handling motors
 BlocMoteurs* moteurs;
@@ -126,28 +129,81 @@ int main(void)
 
 
   //Start Timer2 interrupt (every 20 ms here)
-  HAL_TIM_Base_Start_IT(&htim2);
+  //HAL_TIM_Base_Start_IT(&htim2);
 
   //Init motor class
   moteurs = new BlocMoteurs(&hspi1, reset_shield_1_GPIO_Port, reset_shield_1_Pin, ssel1_GPIO_Port, ssel1_Pin,
 		  	  	  	  	  	  	    reset_shield_2_GPIO_Port, reset_shield_2_Pin, ssel2_GPIO_Port, ssel2_Pin);
-  
 
-  //Set microstepping to 128 for smooth rotations
-  moteurs->set_microstepping_mode(step_mode_t::STEP_MODE_FULL);
 
-  /*
+  //Contrôle par vitesse :
+
+  //accélération pendant 1s, 3s à 5rad/s, décélération pendant 1s //total = 20rad
+
+  int timer_start = HAL_GetTick();
+  bool stopped_motor = false;
+  float* mesure_vitesse_rad;
+  moteurs->set_max_acc_moteurs(5.0, 5.0, 5.0, 5.0);
+  moteurs->set_max_dec_moteurs(5.0, 5.0, 5.0, 5.0);
   moteurs->motors_on();
-  moteurs->commande_vitesses_absolues(1.0, 0.0, 0.0, 0.0);
-  HAL_Delay(1000);
-  moteurs->commande_vitesses_absolues(0.0, 1.0, 0.0, 0.0);
-  HAL_Delay(1000);
-  moteurs->commande_vitesses_absolues(0.0, 0.0, 1.0, 0.0);
-  HAL_Delay(1000);
-  moteurs->commande_vitesses_absolues(0.0, 0.0, 0.0, 1.0);
-  HAL_Delay(1000);
-  moteurs->motors_stop_hard();
-  */
+  moteurs->commande_vitesses_absolues(5.0, 5.0, 5.0, 5.0);
+  while(HAL_GetTick()-timer_start < 5000)
+  {
+	  int timer_start_loop = HAL_GetTick();
+	  mesure_vitesse_rad = moteurs->mesure_vitesses_rad();
+
+	  for( int i = 0; i< 4; i ++)
+	  {
+		  distance_totale[i] += mesure_vitesse_rad[i]*0.02;
+	  }
+
+	  if( HAL_GetTick() - timer_start > 4000 && stopped_motor==false )
+	  {
+		  stopped_motor=true;
+		  moteurs->motors_stop_soft();
+	  }
+	  while( HAL_GetTick() - timer_start_loop < 20);
+
+  }
+
+
+  HAL_Delay(5000);
+
+
+  //Contrôle par pas :
+
+  //accélération pendant 1s, 3s à 5rad/s, décélération pendant 1s //total = 20rad
+  // 1 full step = 1.8°
+  // 20 rad : 20 / ( 1,8 * pi /180) -> 636 full step
+
+
+  moteurs->set_max_speed_moteurs(5.0,5.0,5.0,5.0);
+  moteurs->motors_on();
+  moteurs->mesure_pas_ecoule();
+  moteurs->commande_step(636,636,636,636);
+
+  while(moteurs->get_busy())
+  {
+	  mesure_pas_ecoulees = moteurs->mesure_pas_ecoule();
+	  for( int i = 0; i<4; i ++)
+	  {
+		  somme_mesure_pas_ecoulees[i]+=mesure_pas_ecoulees[i];
+	  }
+  }
+  mesure_pas_ecoulees = moteurs->mesure_pas_ecoule();
+  for( int i = 0; i<4; i ++)
+  {
+	  somme_mesure_pas_ecoulees[i]+=mesure_pas_ecoulees[i];
+  }
+
+
+  
+  while(1);
+
+
+
+
+
 
   /* USER CODE END 2 */
 
